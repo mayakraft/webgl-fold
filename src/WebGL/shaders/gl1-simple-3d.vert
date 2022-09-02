@@ -1,40 +1,41 @@
-uniform mat4 projectionMatrix;
-uniform mat4 modelViewMatrix;
-uniform mat4 matrix;
-attribute vec3 position;
-attribute vec3 normal;
+attribute vec3 v_position;
+attribute vec3 v_normal;
+
+uniform mat4 u_projection;
+uniform mat4 u_modelView;
+uniform mat4 u_matrix;
 // attribute vec3 v_color;
 varying vec3 blend_color;
 varying vec3 normal_color;
 
 // void main () {
-// 	gl_Position = matrix * vec4(position, 1);
+// 	gl_Position = u_matrix * vec4(v_position, 1);
 // 	normal_color = vec3(
-// 		dot(normal, (matrix * vec4(1, 0, 0, 0)).xyz),
-// 		dot(normal, (matrix * vec4(0, 1, 0, 0)).xyz),
-// 		dot(normal, (matrix * vec4(0, 0, 1, 0)).xyz)
+// 		dot(v_normal, (u_matrix * vec4(1, 0, 0, 0)).xyz),
+// 		dot(v_normal, (u_matrix * vec4(0, 1, 0, 0)).xyz),
+// 		dot(v_normal, (u_matrix * vec4(0, 0, 1, 0)).xyz)
 // 	);
 // 	// normal_color = vec3(
-// 	// 	dot(normal, vec4(1, 0, 0, 0).xyz),
-// 	// 	dot(normal, vec4(0, 1, 0, 0).xyz),
-// 	// 	dot(normal, vec4(0, 0, 1, 0).xyz)
+// 	// 	dot(v_normal, vec4(1, 0, 0, 0).xyz),
+// 	// 	dot(v_normal, vec4(0, 1, 0, 0).xyz),
+// 	// 	dot(v_normal, vec4(0, 0, 1, 0).xyz)
 // 	// );
 // 	blend_color = normal_color;
 // }
 
 void main () {
-	gl_Position = matrix * vec4(position, 1);
+	gl_Position = u_matrix * vec4(v_position, 1);
 	// blend_color = v_color;
-	// uniforms.modelViewMatrix
+	// uniforms.u_modelView
 	normal_color = vec3(
-		dot(normal, (modelViewMatrix * vec4(1, 0, 0, 0)).xyz),
-		dot(normal, (modelViewMatrix * vec4(0, 1, 0, 0)).xyz),
-		dot(normal, (modelViewMatrix * vec4(0, 0, 1, 0)).xyz)
+		dot(v_normal, (u_modelView * vec4(1, 0, 0, 0)).xyz),
+		dot(v_normal, (u_modelView * vec4(0, 1, 0, 0)).xyz),
+		dot(v_normal, (u_modelView * vec4(0, 0, 1, 0)).xyz)
 	);
 	// normal_color = vec3(
-	// 	dot(normal, vec4(1, 0, 0, 0).xyz),
-	// 	dot(normal, vec4(0, 1, 0, 0).xyz),
-	// 	dot(normal, vec4(0, 0, 1, 0).xyz)
+	// 	dot(v_normal, vec4(1, 0, 0, 0).xyz),
+	// 	dot(v_normal, vec4(0, 1, 0, 0).xyz),
+	// 	dot(v_normal, vec4(0, 0, 1, 0).xyz)
 	// );
 
 	float grayX = abs(normal_color.x);
@@ -49,5 +50,5 @@ void main () {
 	//  float gray = clamp(grayY, 0.25, 1.0) * 0.5 + 0.5 + grayX * 0.25 + grayZ * 0.25;
 	//  return float4(c, c, c, 1);
 
-	// blend_color = normalize(normal);
+	// blend_color = normalize(v_normal);
 }

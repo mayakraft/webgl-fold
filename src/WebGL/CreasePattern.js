@@ -29,7 +29,7 @@ const makeEdgesVertexArrays = (gl, graph, program) => {
 		.flatMap(() => [[1,0], [-1,0], [-1,0], [1,0]]);
 
 	return [
-		{ location: gl.getAttribLocation(program, "position"),
+		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
 			length: vertices_coords[0].length,
 			data: new Float32Array(vertices_coords.flat()) },
@@ -64,7 +64,7 @@ const makeFacesVertexArrays = (gl, graph, program) => {
 	if (!graph || !graph.vertices_coords) { return []; }
 	const vertices_color = graph.vertices_coords.map(() => [0.11, 0.11, 0.11]);
 	return [
-		{ location: gl.getAttribLocation(program, "position"),
+		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
 			length: graph.vertices_coords[0].length,
 			data: new Float32Array(graph.vertices_coords.flat()) },
@@ -84,42 +84,29 @@ const makeFacesElementArrays = (gl, graph) => {
 	}];
 };
 
-const WebGLCreasePattern = (graph, gl, version = 1) => {
-	const shaders = [];
-	switch (version) {
-		case 1: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
-				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1) },
-			); break;
-		case 2: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
-				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1)},
-			); break;
-	}
-	shaders[0].vertexArrays = makeFacesVertexArrays(gl, graph, shaders[0].program);
-	shaders[1].vertexArrays = makeEdgesVertexArrays(gl, graph, shaders[1].program);
-	shaders[0].elementArrays = makeFacesElementArrays(gl, graph);
-	shaders[1].elementArrays = makeEdgesElementArrays(gl, graph);
-	return shaders;
+const cpFacesV1 = (gl, graph) => {
+	const program = ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1);
+	return {
+		program,
+		vertexArrays: makeFacesVertexArrays(gl, graph, program),
+		elementArrays: makeFacesElementArrays(gl, graph),
+	};
 };
 
-// const WebGLCreasePattern = (graph, gl, version = 1) => {
-// 	const shaders = [];
-// 	switch (version) {
-// 		case 1: shaders.push(
-// 				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1) },
-// 				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
-// 			); break;
-// 		case 2: shaders.push(
-// 				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1)},
-// 				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
-// 			); break;
-// 	}
-// 	shaders[1].vertexArrays = makeFacesVertexArrays(gl, graph, shaders[1].program);
-// 	shaders[0].vertexArrays = makeEdgesVertexArrays(gl, graph, shaders[0].program);
-// 	shaders[1].elementArrays = makeFacesElementArrays(gl, graph);
-// 	shaders[0].elementArrays = makeEdgesElementArrays(gl, graph);
-// 	return shaders;
-// };
+const cpEdgesV1 = (gl, graph) => {
+	const program = ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1);
+	return {
+		program,
+		vertexArrays: makeEdgesVertexArrays(gl, graph, program),
+		elementArrays: makeEdgesElementArrays(gl, graph),
+	};
+};
+
+const WebGLCreasePattern = (gl, version = 1, graph = {}) => {
+	switch (version) {
+		case 1: return [cpFacesV1(gl, graph), cpEdgesV1(gl, graph)]; break;
+		case 2: return [cpFacesV1(gl, graph), cpEdgesV1(gl, graph)]; break;
+	}
+};
 
 export default WebGLCreasePattern;

@@ -103,4 +103,23 @@ const WebGLCreasePattern = (graph, gl, version = 1) => {
 	return shaders;
 };
 
+// const WebGLCreasePattern = (graph, gl, version = 1) => {
+// 	const shaders = [];
+// 	switch (version) {
+// 		case 1: shaders.push(
+// 				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1) },
+// 				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
+// 			); break;
+// 		case 2: shaders.push(
+// 				{ program: ear.webgl.createProgram(gl, vertexThickEdgesV1, fragmentSimpleV1)},
+// 				{ program: ear.webgl.createProgram(gl, vertexSimpleV1, fragmentSimpleV1) },
+// 			); break;
+// 	}
+// 	shaders[1].vertexArrays = makeFacesVertexArrays(gl, graph, shaders[1].program);
+// 	shaders[0].vertexArrays = makeEdgesVertexArrays(gl, graph, shaders[0].program);
+// 	shaders[1].elementArrays = makeFacesElementArrays(gl, graph);
+// 	shaders[0].elementArrays = makeEdgesElementArrays(gl, graph);
+// 	return shaders;
+// };
+
 export default WebGLCreasePattern;

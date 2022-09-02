@@ -1,0 +1,55 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" stroke-width="35">
+	<defs>
+		<code>
+			<![CDATA[
+// var svg = ear.svg();
+svg.size(500, 500)
+  .strokeWidth(svg.getWidth() * 0.07);
+
+const drawLayer = svg.g();
+
+// polygon vertices will be set later
+const polygon = svg.polygon()
+  .fill("none")
+  .stroke("gold")
+  .setClass("stroke-gold")
+  .strokeLinecap("round");
+
+svg.controls(5)
+  .position(() => [svg.getWidth(), svg.getHeight()]
+    .map(n => n * Math.random()))
+  .svg(() => svg.circle(24).fill("red").setClass("fill-red"))
+  .onChange((p, i, arr) => {
+    drawLayer.removeChildren();
+    const hull = ear.math.convexHull(arr);
+    polygon.setPoints(hull);
+    // straight skeleton lines. kawasaki lines are dashed
+    ear.math.straightSkeleton(hull)
+      .map(s => drawLayer.line(s.points[0], s.points[1])
+        .stroke("blue")
+        .setClass("stroke-blue")
+        .strokeDasharray(s.type === "skeleton" ? "" : "30 15"));
+  }, true);
+
+]]>
+		</code>
+	</defs>
+	<g>
+		<line x1="16.968299865722656" y1="463.8009033203125" x2="169.66328985946592" y2="314.5542593128826" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="26.772220611572266" y1="236.8024139404297" x2="169.66328985946592" y2="314.5542593128826" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="23.68646142398326" y1="308.2496127021427" x2="169.66328985946592" y2="314.5542593128826" stroke="blue" class="stroke-blue" stroke-dasharray="30 15"/>
+		<line x1="317.873291015625" y1="30.165912628173828" x2="302.1483850025989" y2="238.77303624748566" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="492.0814208984375" y1="198.34088134765625" x2="302.1483850025989" y2="238.77303624748566" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="413.97264300280506" y1="122.93716001644533" x2="302.1483850025989" y2="238.77303624748566" stroke="blue" class="stroke-blue" stroke-dasharray="30 15"/>
+		<line x1="169.66328985946592" y1="314.5542593128826" x2="267.90589805398474" y2="282.1271288115095" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="302.1483850025989" y1="238.77303624748566" x2="267.90589805398474" y2="282.1271288115095" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="388.009033203125" y1="456.2594299316406" x2="267.90589805398474" y2="282.1271288115095" stroke="blue" class="stroke-blue" stroke-dasharray=""/>
+		<line x1="165.71966374521952" y1="138.17133204310676" x2="267.90589805398474" y2="282.1271288115095" stroke="blue" class="stroke-blue" stroke-dasharray="30 15"/>
+	</g>
+	<polygon points="16.968299865722656,463.8009033203125 26.772220611572266,236.8024139404297 317.873291015625,30.165912628173828 492.0814208984375,198.34088134765625 388.009033203125,456.2594299316406" fill="white" stroke="gold" class="stroke-gold" stroke-linecap="round"/>
+	<circle r="24" fill="red" class="fill-red" cx="16.968299865722656" cy="463.8009033203125"/>
+	<circle r="24" fill="red" class="fill-red" cx="388.009033203125" cy="456.2594299316406"/>
+	<circle r="24" fill="red" class="fill-red" cx="317.873291015625" cy="30.165912628173828"/>
+	<circle r="24" fill="red" class="fill-red" cx="492.0814208984375" cy="198.34088134765625"/>
+	<circle r="24" fill="red" class="fill-red" cx="26.772220611572266" cy="236.8024139404297"/>
+</svg>

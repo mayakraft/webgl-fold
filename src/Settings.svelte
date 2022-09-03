@@ -66,6 +66,7 @@
 
 <style>
 .settings {
+	background-color: #0001;
 	z-index: 2;
 	position: absolute;
 	top: 0;

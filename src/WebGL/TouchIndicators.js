@@ -3,7 +3,7 @@ import vertexShader from "./shaders/gl1-touches.vert?raw";
 import fragmentShader from "./shaders/gl1-touches.frag?raw";
 
 const makeVertexArrays = (gl, program) => [{
-	location: gl.getAttribLocation(program, "position"),
+	location: gl.getAttribLocation(program, "v_position"),
 	buffer: gl.createBuffer(),
 	length: 2,
 	data: new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
@@ -15,19 +15,20 @@ const makeElementArrays = (gl) => [{
 	data: new Uint16Array([0, 1, 2, 3]),
 }];
 
+const indicatorsV1 = (gl) => {
+	const program = ear.webgl.createProgram(gl, vertexShader, fragmentShader);
+	return {
+		program,
+		vertexArrays: makeVertexArrays(gl, program),
+		elementArrays: makeElementArrays(gl),
+	};
+};
+
 const WebGLTouchIndicators = (gl, version = 1) => {
-	const shaders = [];
 	switch (version) {
-		case 1: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexShader, fragmentShader) },
-			); break;
-		case 2: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexShader, fragmentShader) },
-			); break;
+		case 1: return [indicatorsV1(gl)]; break;
+		case 2: return [indicatorsV1(gl)]; break;
 	}
-	shaders[0].vertexArrays = makeVertexArrays(gl, shaders[0].program);
-	shaders[0].elementArrays = makeElementArrays(gl);
-	return shaders;
 };
 
 export default WebGLTouchIndicators;

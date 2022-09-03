@@ -23,7 +23,8 @@
 	let modelMatrix = ear.math.identity4x4;
 	let pressVector; // this is the location of the onPress. used in onMove.
 	let pressViewMatrix; // onPress. used in onMove.
-	let touchPoint = [0, 0, 0]; // mouse pointer. used as input for shader
+	let touchPoint = [0, 0]; // mouse pointer. used as input for shader
+	let projectedTouch = [0, 0, 0]; // todo: get rid of this
 
 	const drawShader = (gl, shader, uniforms) => {
 		gl.useProgram(shader.program);
@@ -60,47 +61,49 @@
 	};
 
 	const makeUniforms = () => ({
-		matrix: {
+		u_matrix: {
 			set: (i, value) => gl.uniformMatrix4fv(i, false, value),
 			value: ear.math.multiplyMatrices4(ear.math
 				.multiplyMatrices4(projectionMatrix, viewMatrix), modelMatrix),
-			// value: ear.math.multiplyMatrices4(projectionMatrix, viewMatrix),
 		},
-		inverseMatrix: {
+		u_inverseMatrix: {
 			set: (i, value) => gl.uniformMatrix4fv(i, false, value),
 			value: ear.math.invertMatrix4(ear.math
 				.multiplyMatrices4(ear.math
 					.multiplyMatrices4(projectionMatrix, viewMatrix), modelMatrix)),
-			// value: ear.math.invertMatrix4(ear.math.multiplyMatrices4(projectionMatrix, viewMatrix)),
 		},
-		projectionMatrix: {
+		u_projection: {
 			set: (i, value) => gl.uniformMatrix4fv(i, false, value),
 			value: projectionMatrix,
 		},
-		modelViewMatrix: {
+		u_view: {
+			set: (i, value) => gl.uniformMatrix4fv(i, false, value),
+			value: viewMatrix,
+		},
+		u_modelView: {
 			set: (i, value) => gl.uniformMatrix4fv(i, false, value),
 			value: ear.math.multiplyMatrices4(viewMatrix, modelMatrix),
 		},
-		thickness: {
+		u_strokeWidth: {
 			set: (i, value) => gl.uniform1f(i, value),
 			value: strokeWidth / 2,
 		},
-		touchPoint: {
-			set: (i, value) => gl.uniform3fv(i, value),
+		u_touch: {
+			set: (i, value) => gl.uniform2fv(i, value),
 			value: touchPoint,
 		},
 		u_resolution: {
 			set: (i, value) => gl.uniform2fv(i, value),
-			value: [canvas.clientWidth, canvas.clientHeight],
+			value: [canvas.clientWidth, canvas.clientHeight]
+				.map(n => n * window.devicePixelRatio || 1),
 		},
-		u_pixelRatio: {
-			set: (i, value) => gl.uniform1f(i, value),
-			value: window.devicePixelRatio,
+		u_projectedTouch: {
+			set: (i, value) => gl.uniform3fv(i, value),
+			value: projectedTouch,
 		},
 	});
 
 	const draw = () => {
-		// console.log("draw", gl != null);
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		const uniforms = makeUniforms(gl);
@@ -108,17 +111,15 @@
 	};
 
 	const makeProjectionMatrix = () => {
-		// console.log("rebuildProjection", canvas != null);
 		if (!canvas) { return ear.math.identity4x4; }
 		const Z_NEAR = 0.01;
 		const Z_FAR = 25;
-		const ORTHO_FAR = -10;
-		const ORTHO_NEAR = 10;
+		const ORTHO_FAR = -100;
+		const ORTHO_NEAR = 100;
 		const canvasDimensions = [canvas.clientWidth, canvas.clientHeight];
 		const vmin = Math.min(...canvasDimensions);
 		const padding = [0, 1].map(i => ((canvasDimensions[i] - vmin) / vmin) / 2);
 		const sides = padding.map(p => p + 0.5);
-		// console.log("ortho", sides[1], sides[0], -sides[1], -sides[0]);
 		return perspective === "orthographic"
 			? ear.math.makeOrthographicMatrix4(sides[1], sides[0], -sides[1], -sides[0], ORTHO_FAR, ORTHO_NEAR)
 			: ear.math.makePerspectiveMatrix4(fov * Math.PI / 180, canvasDimensions[0] / canvasDimensions[1], Z_NEAR, Z_FAR);
@@ -131,7 +132,6 @@
 	 * which brings the vertices inside of a 2x2x2 origin-centered bounding box.
 	 */
 	const makeModelMatrix = () => {
-		// console.log("makeModelMatrix", origami != null);
 		if (!origami) { return ear.math.identity4x4; }
 		const bounds = ear.graph.getBoundingBox(origami);
 		if (!bounds) { return ear.math.identity4x4; }
@@ -141,17 +141,28 @@
 		return ear.math.invertMatrix4(scalePositionMatrix);
 	};
 
+	const rebuildViewport = () => {
+		if (!gl) { return; }
+		const devicePixelRatio = window.devicePixelRatio || 1;
+		const size = [canvas.clientWidth, canvas.clientHeight]
+			.map(n => n * devicePixelRatio);
+		if (canvas.width !== size[0] || canvas.height !== size[1]) {
+			canvas.width = size[0];
+			canvas.height = size[1];
+		}
+		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+	};
+
 	const rebuildShaders = (graph) => {
-		// console.log("rebuildShaders", gl != null);
 		if (!gl) { return; }
 		deallocShaders();
 		shaders = [];
 		switch(viewClass) {
 			case "creasePattern":
-				shaders.push(...CreasePattern(graph, gl, version));
+				shaders.push(...CreasePattern(gl, version, graph));
 				break;
 			case "foldedForm":
-				shaders.push(...FoldedForm(graph, gl, version));
+				shaders.push(...FoldedForm(gl, version, graph));
 				break;
 			default: break;
 		}
@@ -172,7 +183,7 @@
 	};
 
 	const rebuildAllAndDraw = () => {
-		// console.log("rebuildAllAndDraw");
+		rebuildViewport();
 		rebuildShaders(origami);
 		projectionMatrix = makeProjectionMatrix();
 		viewMatrix = makeViewMatrix();
@@ -181,7 +192,7 @@
 	};
 
 	const rebuildProjectionAndDraw = () => {
-		// console.log("rebuildProjectionAndDraw");
+		rebuildViewport();
 		projectionMatrix = makeProjectionMatrix();
 		draw();
 	};
@@ -191,12 +202,8 @@
 	$: draw(strokeWidth);
 
 	onMount(() => {
-		// console.log("onMount")
 		canvas = document.querySelector("canvas");
-		const init = ear.webgl.initialize(canvas, 1);
-		gl = init.gl;
-		version = init.version;
-		if (!gl) { return; }
+		if (!canvas) { throw new Error("canvas not found"); }
 		canvas.addEventListener("mousedown", onPress, false);
 		canvas.addEventListener("mousemove", onMove, false);
 		canvas.addEventListener("mouseup", onRelease, false);
@@ -206,9 +213,15 @@
 		canvas.addEventListener("ontouchend", onRelease, false);
 		// optional open gl settings
 
-		// gl.enable(gl.DEPTH_TEST);
+		const init = ear.webgl.initialize(canvas, 1);
+		gl = init.gl;
+		version = init.version;
+		if (!gl) { throw new Error("WebGL could not initialize"); }
+
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		// gl.enable(gl.DEPTH_TEST);
+
 		rebuildAllAndDraw();
 		// const animate = () => {
 		// 	animationID = window.requestAnimationFrame(animate);
@@ -226,47 +239,25 @@
 	});
 	/**
 	 * matrix is attitude matrix, not projection matrix
+	 * matrix A, matrix B
 	 */
-	const vectorFromScreenLocation = (point, canvasSize) => {
-		// const matrix = ear.math
-		// 	.multiplyMatrices4(ear.math
-		// 		.multiplyMatrices4(projectionMatrix, pressViewMatrix), modelMatrix);
-		const matrix = ear.math
-			.multiplyMatrices4(projectionMatrix, pressViewMatrix);
+	const vectorFromScreenLocation = (point, canvasSize, M = viewMatrix, scale = 1) => {
+		const matrix = ear.math.multiplyMatrices4(projectionMatrix, M);
 		const inverse = ear.math.invertMatrix4(matrix);
-		// const inverse = ear.math.invertMatrix4(projectionMatrix);
-		const scaled = [0, 1].map(i => point[i] / canvasSize[i])
-		const screen = [
-			2.0 * (0.5 - scaled[0]),
-			2.0 * (scaled[1] - 0.5),
-			// 0.05, // this controls the speed of the spin
-			1.0, // this controls the speed of the spin
-			0.0,
-		];
-		// const scaleScreen = [dragSpeed * screen[0], dragSpeed * screen[1], screen[2], screen[3]];
-		const vec = ear.math.multiplyMatrix4Vector3(inverse, screen);
-		return vec;
-		// return ear.math.normalize3(vec);
-	};
-	const vectorFromScreenLocation2 = (point, canvasSize) => {
-		const matrix = ear.math
-			.multiplyMatrices4(ear.math
-				.multiplyMatrices4(projectionMatrix, viewMatrix), modelMatrix);
-		// const matrix = ear.math.multiplyMatrices4(projectionMatrix, viewMatrix);
-		const inverse = ear.math.invertMatrix4(matrix);
-		// const inverse = ear.math.invertMatrix4(projectionMatrix);
-		const scaled = [0, 1].map(i => point[i] / canvasSize[i])
-		const screen = [
-			2.0 * (0.5 - scaled[0]),
-			2.0 * (scaled[1] - 0.5),
-			// 0.05, // this controls the speed of the spin
-			1.0, // this controls the speed of the spin
-			0.0,
-		];
-		// const scaleScreen = [dragSpeed * screen[0], dragSpeed * screen[1], screen[2], screen[3]];
-		const vec = ear.math.multiplyMatrix4Vector3(inverse, screen);
-		return vec;
-		// return ear.math.normalize3(vec);
+		const scaled = [0, 1].map(i => point[i] / canvasSize[i]);
+		const centerScreen = [-2,0,0,0,0,2,0,0,0,0,1,0,1,-1,0,1];
+		// const screen = [
+		// 	2.0 * (0.5 - scaled[0]),
+		// 	2.0 * (scaled[1] - 0.5),
+		// 	1.0
+		// ];
+		// const screen = ear.math.multiplyMatrix4Vector3(centerScreen, [...scaled, 1]);
+		const screen = ear.math.multiplyMatrix4Vector3(
+			ear.math.makeMatrix4Scale([scale, scale, 1]),
+			ear.math.multiplyMatrix4Vector3(centerScreen, [...scaled, 1]),
+		);
+		const res = ear.math.multiplyMatrix4Vector3(inverse, screen);
+		return res;
 	};
 
 	const onPress = (e) => {
@@ -274,30 +265,29 @@
 		pressVector = vectorFromScreenLocation(
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
+			pressViewMatrix,
+			perspective === "perspective" ? 8 : 1,
 		);
-		// console.log("press", pressVector);
 	};
 
 	const onMove = (e) => {
-		touchPoint = [e.offsetX, e.offsetY, 0];
-		// touchPoint = [e.offsetX / canvas.clientWidth, e.offsetY / canvas.clientHeight];
-		// const m = ear.math.multiplyMatrices4(ear.math
-		// 		.multiplyMatrices4(projectionMatrix, viewMatrix), modelMatrix);
-		// touchPoint = ear.math.multiplyMatrix4Vector3(ear.math.invertMatrix4(m), [e.offsetX, e.offsetY, 0, 1]);
-		// touchPoint = [touchPoint[0], touchPoint[1]];
+		const devicePixelRatio = window.devicePixelRatio || 1;
+		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
+		projectedTouch = vectorFromScreenLocation(
+			[e.offsetX, e.offsetY],
+			[canvas.clientWidth, canvas.clientHeight],
+			viewMatrix,
+		);
+		// console.log("projectedTouch", projectedTouch);
 		if (!pressVector) { 
-			// touchPoint = vectorFromScreenLocation2(
-			// 	[e.offsetX, e.offsetY],
-			// 	[canvas.clientWidth, canvas.clientHeight],
-			// );
-			// console.log("HERE", ear.math.multiplyMatrix4Vector3(ear.math.invertMatrix4(m), touchPoint));
-			// console.log("MM", modelMatrix);
 			draw();
 			return;
 		}
 		const nowVector = vectorFromScreenLocation(
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
+			pressViewMatrix,
+			perspective === "perspective" ? 8 : 1,
 		);
 		switch (perspective) {
 			case "perspective": {
@@ -316,17 +306,22 @@
 	};
 
 	const onScroll = (e) => {
+		const devicePixelRatio = window.devicePixelRatio || 1;
+		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
+		projectedTouch = vectorFromScreenLocation(
+			[e.offsetX, e.offsetY],
+			[canvas.clientWidth, canvas.clientHeight],
+			viewMatrix,
+		);
 		const scrollSensitivity = 1 / 100;
+		const delta = -e.deltaY * scrollSensitivity;
+		if (Math.abs(delta) < 1e-3) { return false; }
 		switch (perspective) {
 			case "perspective": {
-				const delta = -e.deltaY * scrollSensitivity;
-				if (Math.abs(delta) < 1e-3) { return false; }
 				const translateMatrix = ear.math.makeMatrix4Translate(0, 0, delta);
 				viewMatrix = ear.math.multiplyMatrices4(translateMatrix, viewMatrix);
 			} break;
 			case "orthographic": {
-				const delta = -e.deltaY * scrollSensitivity;
-				if (Math.abs(delta) < 1e-3) { return false; }
 				const scale = 1 + delta;
 				const scaleMatrix = ear.math.makeMatrix4Scale([scale, scale, scale]);
 				viewMatrix = ear.math.multiplyMatrices4(scaleMatrix, viewMatrix);
@@ -336,7 +331,10 @@
 		return false;
 	};
 
-	const onRelease = () => { pressVector = undefined; };
+	const onRelease = () => {
+		pressVector = undefined;
+		pressViewMatrix = undefined;
+	};
 
 </script>
 

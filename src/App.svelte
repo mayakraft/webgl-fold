@@ -14,10 +14,8 @@
 	let fov = 45;
 
 	const loadFOLD = (result) => {
-		// first, reset any app data. especially if tied to the origami
-		// second: update origami. this can happen two ways, A:
 		origami = result;
-		// update view mode according to file type
+		// update view style according to file type
 		if (origami.frame_classes) {
 			if (origami.frame_classes.includes("creasePattern")) {
 				perspective = "orthographic";

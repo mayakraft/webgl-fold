@@ -20,11 +20,11 @@ const makeVertexArrays = (gl, graph, program) => {
 		.map(sums => ear.math.normalize3(sums));
 	// console.log("vertices_normals", vertices_normals);
 	return [
-		{ location: gl.getAttribLocation(program, "position"),
+		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
 			length: vertices_coords[0].length,
 			data: new Float32Array(vertices_coords.flat()) },
-		{ location: gl.getAttribLocation(program, "normal"),
+		{ location: gl.getAttribLocation(program, "v_normal"),
 			buffer: gl.createBuffer(),
 			length: vertices_normals[0].length,
 			data: new Float32Array(vertices_normals.flat()) },
@@ -40,19 +40,20 @@ const makeElementArrays = (gl, graph) => {
 	}];
 };
 
-const WebGLFoldedForm = (graph, gl, version = 1) => {
-	const shaders = [];
+const foldedFacesV1 = (gl, graph) => {
+	const program = ear.webgl.createProgram(gl, vertexShader, fragmentShader);
+	return {
+		program,
+		vertexArrays: makeVertexArrays(gl, graph, program),
+		elementArrays: makeElementArrays(gl, graph),
+	};
+};
+
+const WebGLFoldedForm = (gl, version = 1, graph = {}) => {
 	switch (version) {
-		case 1: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexShader, fragmentShader) },
-			); break;
-		case 2: shaders.push(
-				{ program: ear.webgl.createProgram(gl, vertexShader, fragmentShader) },
-			); break;
+		case 1: return [foldedFacesV1(gl, graph)]; break;
+		case 2: return [foldedFacesV1(gl, graph)]; break;
 	}
-	shaders[0].vertexArrays = makeVertexArrays(gl, graph, shaders[0].program);
-	shaders[0].elementArrays = makeElementArrays(gl, graph);
-	return shaders;
 };
 
 export default WebGLFoldedForm;

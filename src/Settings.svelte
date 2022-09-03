@@ -3,6 +3,7 @@
 	// example FOLD files
 	import craneCP from "./fold/crane-cp.fold?raw";
 	import craneCP600 from "./fold/crane-cp-600.fold?raw";
+	import craneFolded from "./fold/crane-folded.fold?raw";
 	import bird3d from "./fold/bird-3d.fold?raw";
 	import moosers3d from "./fold/moosers-train-3d.fold?raw";
 
@@ -15,6 +16,7 @@
 </script>
 
 <div class="settings">
+	<h3>viewport</h3>
 	<input
 		type="radio"
 		name="radio-webgl-perspective"
@@ -30,9 +32,12 @@
 		checked={perspective==="perspective"}>
 	<label for="radio-webgl-perspective-perspective">perspective</label>
 	<br />
-	<span>field of view:</span><input type="text" placeholder="field of view" bind:value={fov}>
-
-<!-- 	<br/>
+	{#if perspective === "perspective"}
+		<span>field of view:</span><input type="text" placeholder="field of view" bind:value={fov}>
+		<br/>
+	{/if}
+	<hr />
+	<h3>style</h3>
 	<input
 		type="radio"
 		name="radio-view-class"
@@ -46,17 +51,21 @@
 		value="radio-view-class-folded-form"
 		on:click={() => viewClass = "foldedForm"}
 		checked={viewClass==="foldedForm"}>
-	<label for="radio-view-class-folded-form">folded form</label> -->
+	<label for="radio-view-class-folded-form">folded form</label>
+	<br />
+	{#if viewClass === "creasePattern"}
+		<span>stroke width</span><input type="range" min="0.001" max="0.2" step="0.001" bind:value={strokeWidth} />
+	{/if}
 	<hr />
-	<span>stroke width</span><input type="range" min="0.001" max="0.2" step="0.001" bind:value={strokeWidth} />
-	<hr />
-	<p>current FOLD:</p>
+	<h3>current FOLD</h3>
 	<p>V: <b>{ear.graph.count.vertices(origami)}</b>, E: <b>{ear.graph.count.edges(origami)}</b>, F: <b>{ear.graph.count.faces(origami)}</b></p>
 	<hr />
 	<p>example:</p>
 	<button on:click={() => loadFOLD(JSON.parse(craneCP))}>cp: crane 1x1</button>
 	<br />
 	<button on:click={() => loadFOLD(JSON.parse(craneCP600))}>cp: crane 600x600</button>
+	<br />
+	<button on:click={() => loadFOLD(JSON.parse(craneFolded))}>folded: crane</button>
 	<br />
 	<button on:click={() => loadFOLD(JSON.parse(bird3d))}>folded: flapping bird</button>
 	<br />
@@ -72,5 +81,13 @@
 	top: 0;
 	left: 0;
 	padding: 0.5rem;
+}
+h3 {
+	margin: 0;
+	padding: 0;
+
+}
+input[type=text] {
+	width: 3rem;
 }
 </style>

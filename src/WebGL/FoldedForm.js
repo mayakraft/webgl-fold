@@ -13,8 +13,10 @@ const makeVertexArrays = (gl, graph, program) => {
 		: ear.graph.makeVerticesFacesUnsorted(graph);
 	// const vertices_normals = vertices_coords
 	// 	.map(coord => ear.math.normalize3(coord));
+	// console.log("vertices_faces", vertices_faces);
 	const vertices_normals = vertices_faces
 		.map(faces => faces
+			.filter(f => f != null) // vertices_faces can contain null
 			.map(f => facesNormals[f])
 			.reduce((v, u) => [v[0] + u[0], v[1] + u[1], v[2] + u[2]], [0, 0, 0]))
 		.map(sums => ear.math.normalize3(sums));

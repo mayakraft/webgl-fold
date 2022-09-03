@@ -272,14 +272,14 @@
 
 	const onMove = (e) => {
 		const devicePixelRatio = window.devicePixelRatio || 1;
-		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
-		projectedTouch = vectorFromScreenLocation(
-			[e.offsetX, e.offsetY],
-			[canvas.clientWidth, canvas.clientHeight],
-			viewMatrix,
-		);
 		// console.log("projectedTouch", projectedTouch);
 		if (!pressVector) { 
+			touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
+			projectedTouch = vectorFromScreenLocation(
+				[e.offsetX, e.offsetY],
+				[canvas.clientWidth, canvas.clientHeight],
+				viewMatrix,
+			);
 			draw();
 			return;
 		}
@@ -302,17 +302,17 @@
 				viewMatrix = ear.math.multiplyMatrices4(pressViewMatrix, matrix);
 			} break;
 		}
-		draw();
-	};
-
-	const onScroll = (e) => {
-		const devicePixelRatio = window.devicePixelRatio || 1;
 		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
 		projectedTouch = vectorFromScreenLocation(
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
 			viewMatrix,
 		);
+		draw();
+	};
+
+	const onScroll = (e) => {
+		const devicePixelRatio = window.devicePixelRatio || 1;
 		const scrollSensitivity = 1 / 100;
 		const delta = -e.deltaY * scrollSensitivity;
 		if (Math.abs(delta) < 1e-3) { return false; }
@@ -327,6 +327,12 @@
 				viewMatrix = ear.math.multiplyMatrices4(scaleMatrix, viewMatrix);
 			} break;
 		}
+		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
+		projectedTouch = vectorFromScreenLocation(
+			[e.offsetX, e.offsetY],
+			[canvas.clientWidth, canvas.clientHeight],
+			viewMatrix,
+		);
 		draw();
 		return false;
 	};

@@ -13,25 +13,34 @@ const assignment_colors = {
 	U: [0.2, 0.2, 0.2],     u: [0.2, 0.2, 0.2],
 };
 
+const make2D = (coords) => coords
+	.map(coord => [0, 1]
+		.map(i => coord[i] || 0));
+
 const makeEdgesVertexArrays = (gl, graph, program) => {
 	if (!graph || !graph.vertices_coords || !graph.edges_vertices) { return []; }
-	const vertices_coords = graph.edges_vertices
+	const vertices_coords = make2D(graph.edges_vertices
 		.flatMap(edge => edge
 			.map(v => graph.vertices_coords[v]))
-			.flatMap(coord => [coord, coord]);
-	const edgesVector = ear.graph.makeEdgesVector(graph);
-	const edgesOrigin = graph.edges_vertices.map(edge => graph.vertices_coords[edge[0]]);
+		.flatMap(coord => [coord, coord]));
+	const edgesVector = make2D(ear.graph.makeEdgesVector(graph));
+	const edgesOrigin = make2D(graph.edges_vertices.map(edge => graph.vertices_coords[edge[0]]));
 	const vertices_color = graph.edges_assignment
 		.flatMap(a => [assignment_colors[a], assignment_colors[a], assignment_colors[a], assignment_colors[a]]);
 	const verticesEdgesVector = edgesVector
 		.flatMap(el => [el, el, el, el]);
 	const verticesVector = graph.edges_vertices
 		.flatMap(() => [[1,0], [-1,0], [-1,0], [1,0]]);
-
+	// console.log("vertices_coords", vertices_coords);
+	// console.log("edgesVector", edgesVector);
+	// console.log("edgesOrigin", edgesOrigin);
+	// console.log("verticesEdgesVector", verticesEdgesVector);
+	// console.log("verticesVector", verticesVector);
 	return [
 		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
-			length: vertices_coords[0].length,
+			length: 2,
+			// length: vertices_coords[0].length,
 			data: new Float32Array(vertices_coords.flat()) },
 		{ location: gl.getAttribLocation(program, "v_color"),
 			buffer: gl.createBuffer(),
@@ -66,8 +75,9 @@ const makeFacesVertexArrays = (gl, graph, program) => {
 	return [
 		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
-			length: graph.vertices_coords[0].length,
-			data: new Float32Array(graph.vertices_coords.flat()) },
+			length: 2,
+			// length: graph.vertices_coords[0].length,
+			data: new Float32Array(make2D(graph.vertices_coords).flat()) },
 		{ location: gl.getAttribLocation(program, "v_color"),
 			buffer: gl.createBuffer(),
 			length: vertices_color[0].length,

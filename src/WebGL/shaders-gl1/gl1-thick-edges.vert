@@ -1,3 +1,5 @@
+#version 100
+
 attribute vec2 v_position;
 attribute vec3 v_color;
 attribute vec2 edge_vector;

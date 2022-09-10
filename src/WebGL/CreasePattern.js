@@ -1,9 +1,10 @@
 import ear from "rabbit-ear";
-import fragmentSimpleV1 from "./shaders/gl1-simple.frag?raw";
-import vertexSimpleV1 from "./shaders/gl1-simple.vert?raw";
-import vertexThickEdgesV1 from "./shaders/gl1-thick-edges.vert?raw";
-// import vertexThickEdges3 from "../WebGL/thickEdges3.vert?raw";
-// import fragmentSimple3 from "../WebGL/simple3.frag?raw";
+import vertexSimpleV1 from "./shaders-gl1/gl1-simple-2d.vert?raw";
+import vertexThickEdgesV1 from "./shaders-gl1/gl1-thick-edges.vert?raw";
+import fragmentSimpleV1 from "./shaders-gl1/gl1-simple-2d.frag?raw";
+import vertexSimpleV2 from "./shaders-gl2/gl2-simple-2d.vert?raw";
+import vertexThickEdgesV2 from "./shaders-gl2/gl2-thick-edges.vert?raw";
+import fragmentSimpleV2 from "./shaders-gl2/gl2-simple-2d.frag?raw";
 
 const assignment_colors = {
 	B: [0.33, 0.33, 0.33],  b: [0.33, 0.33, 0.33],
@@ -112,10 +113,28 @@ const cpEdgesV1 = (gl, graph) => {
 	};
 };
 
+const cpFacesV2 = (gl, graph) => {
+	const program = ear.webgl.createProgram(gl, vertexSimpleV2, fragmentSimpleV2);
+	return {
+		program,
+		vertexArrays: makeFacesVertexArrays(gl, graph, program),
+		elementArrays: makeFacesElementArrays(gl, graph),
+	};
+};
+
+const cpEdgesV2 = (gl, graph) => {
+	const program = ear.webgl.createProgram(gl, vertexThickEdgesV2, fragmentSimpleV2);
+	return {
+		program,
+		vertexArrays: makeEdgesVertexArrays(gl, graph, program),
+		elementArrays: makeEdgesElementArrays(gl, graph),
+	};
+};
+
 const WebGLCreasePattern = (gl, version = 1, graph = {}) => {
 	switch (version) {
 		case 1: return [cpFacesV1(gl, graph), cpEdgesV1(gl, graph)]; break;
-		case 2: return [cpFacesV1(gl, graph), cpEdgesV1(gl, graph)]; break;
+		case 2: return [cpFacesV2(gl, graph), cpEdgesV2(gl, graph)]; break;
 	}
 };
 

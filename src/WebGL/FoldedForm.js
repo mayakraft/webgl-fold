@@ -1,6 +1,8 @@
 import ear from "rabbit-ear";
-import vertexShader from "./shaders/gl1-simple-3d.vert?raw";
-import fragmentShader from "./shaders/gl1-simple.frag?raw";
+import vertexShaderV1 from "./shaders-gl1/gl1-3d-model.vert?raw";
+import fragmentShaderV1 from "./shaders-gl1/gl1-3d-model.frag?raw";
+import vertexShaderV2 from "./shaders-gl2/gl2-3d-model.vert?raw";
+import fragmentShaderV2 from "./shaders-gl2/gl2-3d-model.frag?raw";
 
 const makeVertexArrays = (gl, graph, program) => {
 	if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return []; }
@@ -42,20 +44,15 @@ const makeElementArrays = (gl, graph) => {
 	}];
 };
 
-const foldedFacesV1 = (gl, graph) => {
-	const program = ear.webgl.createProgram(gl, vertexShader, fragmentShader);
-	return {
+const WebGLFoldedForm = (gl, version = 1, graph = {}) => {
+	const program = version == 2
+		? ear.webgl.createProgram(gl, vertexShaderV2, fragmentShaderV2)
+		: ear.webgl.createProgram(gl, vertexShaderV1, fragmentShaderV1);
+	return [{
 		program,
 		vertexArrays: makeVertexArrays(gl, graph, program),
 		elementArrays: makeElementArrays(gl, graph),
-	};
-};
-
-const WebGLFoldedForm = (gl, version = 1, graph = {}) => {
-	switch (version) {
-		case 1: return [foldedFacesV1(gl, graph)]; break;
-		case 2: return [foldedFacesV1(gl, graph)]; break;
-	}
+	}];
 };
 
 export default WebGLFoldedForm;

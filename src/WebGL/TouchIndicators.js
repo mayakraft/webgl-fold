@@ -1,6 +1,6 @@
 import ear from "rabbit-ear";
-import vertexShader from "./shaders/gl1-touches.vert?raw";
-import fragmentShader from "./shaders/gl1-touches.frag?raw";
+import vertexShader from "./shaders-gl1/gl1-touches.vert?raw";
+import fragmentShader from "./shaders-gl1/gl1-touches.frag?raw";
 
 const makeVertexArrays = (gl, program) => [{
 	location: gl.getAttribLocation(program, "v_position"),

@@ -52,6 +52,7 @@ const WebGLFoldedForm = (gl, version = 1, graph = {}) => {
 		program,
 		vertexArrays: makeVertexArrays(gl, graph, program),
 		elementArrays: makeElementArrays(gl, graph),
+		flags: [gl.DEPTH_TEST],
 	}];
 };
 

@@ -29,7 +29,7 @@
 
 	const drawShader = (gl, shader, uniforms) => {
 		gl.useProgram(shader.program);
-		// gl.enable(gl.DEPTH_TEST);
+		shader.flags.forEach(flag => gl.enable(flag));
 		// set uniforms
 		const uniformCount = gl.getProgramParameter(shader.program, gl.ACTIVE_UNIFORMS);
 		for (let i = 0; i < uniformCount; i += 1) {
@@ -58,7 +58,7 @@
 				el.buffer
 			);
 		});
-		// gl.disable(gl.DEPTH_TEST);
+		shader.flags.forEach(flag => gl.disable(flag));
 	};
 
 	const makeUniforms = () => ({

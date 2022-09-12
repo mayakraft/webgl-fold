@@ -2,7 +2,7 @@
 	import ear from "rabbit-ear";
 	// example FOLD files
 	import craneCP from "./fold/crane-cp.fold?raw";
-	import craneCP600 from "./fold/crane-cp-600.fold?raw";
+	import craneCP100 from "./fold/crane-cp-100.fold?raw";
 	import craneFolded from "./fold/crane-folded.fold?raw";
 	import bird3d from "./fold/bird-3d.fold?raw";
 	import moosers3d from "./fold/moosers-train-3d.fold?raw";
@@ -67,7 +67,7 @@
 	<h3>example:</h3>
 	<button on:click={() => loadFOLD(JSON.parse(craneCP))}>cp: crane 1x1</button>
 	<br />
-	<button on:click={() => loadFOLD(JSON.parse(craneCP600))}>cp: crane 600x600</button>
+	<button on:click={() => loadFOLD(JSON.parse(craneCP100))}>cp: crane 100x100</button>
 	<br />
 	<button on:click={() => loadFOLD(JSON.parse(craneFolded))}>folded: 2D crane</button>
 	<br />
@@ -76,7 +76,7 @@
 	<button on:click={() => loadFOLD(JSON.parse(moosers3d))}>folded: 3D moser's train</button>
 <!-- 	<hr />
 	<p class="small">
-		<b>dev notes:</b> depth test is OFF; this is intentional, the layer order will be calculated. large CPs (600x600) need larger stroke width.
+		<b>dev notes:</b> depth test is OFF; this is intentional, the layer order will be calculated. large CPs (100x100) need larger stroke width.
 	</p> -->
 </div>
 

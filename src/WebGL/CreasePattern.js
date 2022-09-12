@@ -101,6 +101,7 @@ const cpFacesV1 = (gl, graph) => {
 		program,
 		vertexArrays: makeFacesVertexArrays(gl, graph, program),
 		elementArrays: makeFacesElementArrays(gl, graph),
+		flags: [],
 	};
 };
 
@@ -110,6 +111,7 @@ const cpEdgesV1 = (gl, graph) => {
 		program,
 		vertexArrays: makeEdgesVertexArrays(gl, graph, program),
 		elementArrays: makeEdgesElementArrays(gl, graph),
+		flags: [],
 	};
 };
 
@@ -119,6 +121,7 @@ const cpFacesV2 = (gl, graph) => {
 		program,
 		vertexArrays: makeFacesVertexArrays(gl, graph, program),
 		elementArrays: makeFacesElementArrays(gl, graph),
+		flags: [],
 	};
 };
 
@@ -128,6 +131,7 @@ const cpEdgesV2 = (gl, graph) => {
 		program,
 		vertexArrays: makeEdgesVertexArrays(gl, graph, program),
 		elementArrays: makeEdgesElementArrays(gl, graph),
+		flags: [],
 	};
 };
 

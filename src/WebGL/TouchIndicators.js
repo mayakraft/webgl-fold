@@ -21,6 +21,7 @@ const indicatorsV1 = (gl) => {
 		program,
 		vertexArrays: makeVertexArrays(gl, program),
 		elementArrays: makeElementArrays(gl),
+		flags: [],
 	};
 };
 

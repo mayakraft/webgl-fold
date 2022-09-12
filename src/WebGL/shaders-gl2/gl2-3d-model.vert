@@ -6,7 +6,8 @@ uniform mat4 u_matrix;
 
 in vec3 v_position;
 in vec3 v_normal;
-out vec3 blend_color;
+out vec3 front_color;
+out vec3 back_color;
 
 void main () {
 	gl_Position = u_matrix * vec4(v_position, 1);
@@ -27,5 +28,6 @@ void main () {
 	float grayZ = abs(normal_color.z);
 	float gray = 0.25 + clamp(grayY, 1.0, 0.25) * 0.5 + grayX * 0.25 + grayZ * 0.25;
 	float c = clamp(gray, 0.0, 1.0);
-	blend_color = vec3(c, c, c);
+	front_color = vec3(c * 0.333, c * 0.5, c);
+	back_color = vec3(c, c, c);
 }

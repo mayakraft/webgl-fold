@@ -4,21 +4,23 @@ import fragmentShaderV1 from "./shaders-gl1/gl1-3d-model.frag?raw";
 import vertexShaderV2 from "./shaders-gl2/gl2-3d-model.vert?raw";
 import fragmentShaderV2 from "./shaders-gl2/gl2-3d-model.frag?raw";
 
+// add two 3D vectors, store result in first parameter
+const add3 = (a, b) => { a[0] += b[0]; a[1] += b[1]; a[2] += b[2]; };
+
+const makeVertexNormals = (graph) => {
+	const faces_normals = ear.graph.makeFacesNormal(graph);
+	const vertices_normals = graph.vertices_coords.map(() => [0, 0, 0]);
+	graph.faces_vertices
+		.forEach((vertices, f) => vertices
+			.forEach(v => add3(vertices_normals[v], faces_normals[f])));
+	return vertices_normals.map(v => ear.math.normalize3(v));
+}
+
 const makeVertexArrays = (gl, graph, program) => {
 	if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return []; }
 	const vertices_coords = graph.vertices_coords
 		.map(coord => [...coord].concat(Array(3 - coord.length).fill(0)));
-	const facesNormals = ear.graph.makeFacesNormal(graph);
-	const vertices_faces = graph.vertices_faces
-		? graph.vertices_faces
-		: ear.graph.makeVerticesFacesUnsorted(graph);
-	const vertices_normals = vertices_faces
-		.map(faces => faces
-			.filter(f => f != null) // vertices_faces can contain null
-			.map(f => facesNormals[f])
-			.reduce((v, u) => [v[0] + u[0], v[1] + u[1], v[2] + u[2]], [0, 0, 0]))
-		.map(sums => ear.math.normalize3(sums));
-	// console.log("vertices_faces", vertices_faces);
+	const vertices_normals = makeVertexNormals(graph);
 	// console.log("vertices_normals", vertices_normals);
 	return [
 		{ location: gl.getAttribLocation(program, "v_position"),

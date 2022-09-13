@@ -12,7 +12,7 @@ const makeVertexArrays = (gl, program) => [{
 const makeElementArrays = (gl) => [{
 	mode: gl.TRIANGLE_STRIP,
 	buffer: gl.createBuffer(),
-	data: new Uint16Array([0, 1, 2, 3]),
+	data: new Uint32Array([0, 1, 2, 3]),
 }];
 
 const indicatorsV1 = (gl) => {

@@ -66,7 +66,7 @@ const makeEdgesElementArrays = (gl, graph) => {
 	return [{
 		mode: gl.TRIANGLES,
 		buffer: gl.createBuffer(),
-		data: new Uint16Array(edgesTriangles),
+		data: new Uint32Array(edgesTriangles),
 	}];
 };
 
@@ -91,7 +91,7 @@ const makeFacesElementArrays = (gl, graph) => {
 	return [{
 		mode: gl.TRIANGLES,
 		buffer: gl.createBuffer(),
-		data: new Uint16Array(ear.graph.triangulateConvexFacesVertices(graph).flat()),
+		data: new Uint32Array(ear.graph.triangulateConvexFacesVertices(graph).flat()),
 	}];
 };
 

@@ -14,6 +14,24 @@
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
 	export let loadFOLD = () => {};
+
+	const fileDialogDidLoad = (string, filename, mimeType) => {
+		try { loadFOLD(JSON.parse(string)); }
+		catch (error) { window.alert(error); }
+	};
+
+	let files;
+	$: if (files) {
+		const file = files[0];
+		let mimeType, filename;
+		const reader = new FileReader();
+		reader.onload = loadEvent => fileDialogDidLoad(loadEvent.target.result, filename, mimeType);
+		if (files.length) {
+			mimeType = files[0].type;
+			filename = files[0].name;
+			reader.readAsText(files[0]);
+		}
+	}
 </script>
 
 <div class="settings">
@@ -78,6 +96,9 @@
 	<p class="small">
 		<b>dev notes:</b> depth test is OFF; this is intentional, the layer order will be calculated. large CPs (100x100) need larger stroke width.
 	</p> -->
+	<hr />
+	<h3>load FOLD</h3>
+	<input type="file" bind:files>
 </div>
 
 <style>

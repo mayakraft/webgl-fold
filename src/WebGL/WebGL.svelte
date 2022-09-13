@@ -54,7 +54,7 @@
 			gl.drawElements(
 				el.mode, // GL.TRIANGLES for example
 				el.data.length,
-				gl.UNSIGNED_SHORT,
+				gl.UNSIGNED_INT, // gl.UNSIGNED_SHORT,
 				el.buffer
 			);
 		});

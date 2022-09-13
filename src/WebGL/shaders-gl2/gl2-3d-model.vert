@@ -1,6 +1,6 @@
 #version 300 es
 
-uniform mat4 u_projection;
+// uniform mat4 u_projection;
 uniform mat4 u_modelView;
 uniform mat4 u_matrix;
 
@@ -8,9 +8,11 @@ in vec3 v_position;
 in vec3 v_normal;
 out vec3 front_color;
 out vec3 back_color;
+flat out int provokedVertex;
 
 void main () {
 	gl_Position = u_matrix * vec4(v_position, 1);
+	provokedVertex = gl_VertexID;
 
 	vec3 normal_color = vec3(
 		dot(v_normal, (u_modelView * vec4(1, 0, 0, 0)).xyz),

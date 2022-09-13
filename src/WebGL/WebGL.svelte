@@ -10,7 +10,8 @@
 	export let viewClass = "creasePattern";
 	export let fov = 45;
 	export let strokeWidth = 0.0025;
-	let dragSpeed = 8.0;
+	export let opacity = 1.0;
+	let dragSpeed = 3.0;
 	let { innerWidth, innerHeight } = window;
 
 	// webgl, hold onto these so we can dealloc them later
@@ -28,7 +29,7 @@
 
 	const drawShader = (gl, shader, uniforms) => {
 		gl.useProgram(shader.program);
-		// gl.enable(gl.DEPTH_TEST);
+		shader.flags.forEach(flag => gl.enable(flag));
 		// set uniforms
 		const uniformCount = gl.getProgramParameter(shader.program, gl.ACTIVE_UNIFORMS);
 		for (let i = 0; i < uniformCount; i += 1) {
@@ -53,11 +54,11 @@
 			gl.drawElements(
 				el.mode, // GL.TRIANGLES for example
 				el.data.length,
-				gl.UNSIGNED_SHORT,
+				gl.UNSIGNED_INT, // gl.UNSIGNED_SHORT,
 				el.buffer
 			);
 		});
-		// gl.disable(gl.DEPTH_TEST);
+		shader.flags.forEach(flag => gl.disable(flag));
 	};
 
 	const makeUniforms = () => ({
@@ -87,6 +88,10 @@
 		u_strokeWidth: {
 			set: (i, value) => gl.uniform1f(i, value),
 			value: strokeWidth / 2,
+		},
+		u_opacity: {
+			set: (i, value) => gl.uniform1f(i, value),
+			value: opacity,
 		},
 		u_touch: {
 			set: (i, value) => gl.uniform2fv(i, value),
@@ -199,7 +204,7 @@
 
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
 	$: rebuildAllAndDraw(origami, viewClass, perspective);
-	$: draw(strokeWidth);
+	$: draw(strokeWidth, opacity);
 
 	onMount(() => {
 		canvas = document.querySelector("canvas");
@@ -213,7 +218,8 @@
 		canvas.addEventListener("ontouchend", onRelease, false);
 		// optional open gl settings
 
-		const init = ear.webgl.initialize(canvas, 1);
+		// const init = ear.webgl.initialize(canvas, 1); // WebGL version 1
+		const init = ear.webgl.initialize(canvas, 2); // WebGL version 2
 		gl = init.gl;
 		version = init.version;
 		if (!gl) { throw new Error("WebGL could not initialize"); }
@@ -266,7 +272,7 @@
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
 			pressViewMatrix,
-			perspective === "perspective" ? 8 : 1,
+			perspective === "perspective" ? dragSpeed : 1,
 		);
 	};
 
@@ -287,7 +293,7 @@
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
 			pressViewMatrix,
-			perspective === "perspective" ? 8 : 1,
+			perspective === "perspective" ? dragSpeed : 1,
 		);
 		switch (perspective) {
 			case "perspective": {

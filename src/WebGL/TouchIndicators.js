@@ -1,6 +1,6 @@
 import ear from "rabbit-ear";
-import vertexShader from "./shaders/gl1-touches.vert?raw";
-import fragmentShader from "./shaders/gl1-touches.frag?raw";
+import vertexShader from "./shaders-gl1/gl1-touches.vert?raw";
+import fragmentShader from "./shaders-gl1/gl1-touches.frag?raw";
 
 const makeVertexArrays = (gl, program) => [{
 	location: gl.getAttribLocation(program, "v_position"),
@@ -12,7 +12,7 @@ const makeVertexArrays = (gl, program) => [{
 const makeElementArrays = (gl) => [{
 	mode: gl.TRIANGLE_STRIP,
 	buffer: gl.createBuffer(),
-	data: new Uint16Array([0, 1, 2, 3]),
+	data: new Uint32Array([0, 1, 2, 3]),
 }];
 
 const indicatorsV1 = (gl) => {
@@ -21,6 +21,7 @@ const indicatorsV1 = (gl) => {
 		program,
 		vertexArrays: makeVertexArrays(gl, program),
 		elementArrays: makeElementArrays(gl),
+		flags: [],
 	};
 };
 

@@ -1,3 +1,5 @@
+#version 100
+
 attribute vec3 v_position;
 attribute vec3 v_normal;
 

@@ -1,6 +1,8 @@
-# FOLD in WebGL
+# WebGL FOLD file view
 
-Draw a FOLD object in an HTML canvas using WebGL. Currently there are two drawing styles:
+Render a [FOLD file](https://github.com/edemaine/FOLD/) in an HTML canvas with WebGL. Here are the features, so far:
 
-- crease pattern, with thick edges (computed on shader), colored by assignment type.
-- folded form, a typical 3D mesh with shaded faces, double sided, as most origami is white on one side.
+- two drawing styles, one for crease patterns, one for folded models.
+- the crease pattern style features thick lines, computed on a shader.
+- orthographic and perspective
+- basic touch input for panning, rotating

@@ -11,6 +11,7 @@
 	let perspective = "orthographic";
 	let viewClass = "creasePattern"; //"foldedForm"; //"creasePattern";
 	let strokeWidth = 0.0025;
+	let opacity = 1.0;
 	let fov = 45;
 
 	const loadFOLD = (result) => {
@@ -33,11 +34,12 @@
 </script>
 
 <main>
-	<WebGL {origami} {viewClass} {perspective} {strokeWidth} {fov} />
+	<WebGL {origami} {viewClass} {perspective} {strokeWidth} {opacity} {fov} />
 	<Settings
 		bind:perspective={perspective}
 		bind:viewClass={viewClass}
 		bind:strokeWidth={strokeWidth}
+		bind:opacity={opacity}
 		bind:fov={fov}
 		{loadFOLD}
 		{origami}

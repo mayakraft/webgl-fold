@@ -1,11 +1,11 @@
 <script>
 	import ear from "rabbit-ear";
 	// example FOLD files
-	import craneCP from "./fold/crane-cp.fold?raw";
-	import craneCP100 from "./fold/crane-cp-100.fold?raw";
-	import craneFolded from "./fold/crane-folded.fold?raw";
-	import bird3d from "./fold/bird-3d.fold?raw";
-	import moosers3d from "./fold/moosers-train-3d.fold?raw";
+	import craneCP from "../../fold/crane-cp.fold?raw";
+	import craneCP100 from "../../fold/crane-cp-100.fold?raw";
+	import craneFolded from "../../fold/crane-folded.fold?raw";
+	import bird3d from "../../fold/bird-3d.fold?raw";
+	import moosers3d from "../../fold/moosers-train-3d.fold?raw";
 
 	export let origami = {};
 	export let perspective = "orthographic";

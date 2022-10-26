@@ -1,9 +1,9 @@
 <script>
 	import { onMount } from "svelte";
 	import Settings from "./Settings.svelte";
-	import WebGL from "./WebGL/WebGL.svelte";
+	import WebGLView from "./WebGLView.svelte";
 
-	import craneCP from "./fold/crane-cp.fold?raw";
+	import craneCP from "../../fold/crane-cp.fold?raw";
 
 	// the origami
 	let origami = {};
@@ -34,7 +34,7 @@
 </script>
 
 <main>
-	<WebGL {origami} {viewClass} {perspective} {strokeWidth} {opacity} {fov} />
+	<WebGLView {origami} {viewClass} {perspective} {strokeWidth} {opacity} {fov} />
 	<Settings
 		bind:perspective={perspective}
 		bind:viewClass={viewClass}

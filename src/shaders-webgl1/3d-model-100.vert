@@ -1,20 +1,22 @@
-#version 300 es
+#version 100
 
-// uniform mat4 u_projection;
+attribute vec3 v_position;
+attribute vec3 v_normal;
+attribute vec3 v_barycentric;
+
+uniform mat4 u_projection;
 uniform mat4 u_modelView;
 uniform mat4 u_matrix;
-
-in vec3 v_position;
-in vec3 v_normal;
-out vec3 front_color;
-out vec3 back_color;
-flat out int provokedVertex;
+varying vec3 normal_color;
+varying vec3 barycentric;
+varying vec3 front_color;
+varying vec3 back_color;
 
 void main () {
 	gl_Position = u_matrix * vec4(v_position, 1);
-	provokedVertex = gl_VertexID;
+	barycentric = v_barycentric;
 
-	vec3 normal_color = vec3(
+	normal_color = vec3(
 		dot(v_normal, (u_modelView * vec4(1, 0, 0, 0)).xyz),
 		dot(v_normal, (u_modelView * vec4(0, 1, 0, 0)).xyz),
 		dot(v_normal, (u_modelView * vec4(0, 0, 1, 0)).xyz)

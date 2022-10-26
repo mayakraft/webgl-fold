@@ -1,49 +1,53 @@
 <script>
-	import { onMount } from "svelte";
+	import ear from "rabbit-ear";
 	import Settings from "./Settings.svelte";
 	import WebGLView from "./WebGLView.svelte";
 
-	import craneCP from "../../fold/crane-cp.fold?raw";
+	// the origami (FOLD object)
+	let FOLD = {};
+	let frames = [];
+	let selectedFrame = 0;
 
-	// the origami
-	let origami = {};
 	// view options
 	let perspective = "orthographic";
-	let viewClass = "creasePattern"; //"foldedForm"; //"creasePattern";
+	let viewClass = "creasePattern"; // "foldedForm"; // "creasePattern";
 	let strokeWidth = 0.0025;
 	let opacity = 1.0;
 	let fov = 45;
 
+	$: frames = getFileFrames(FOLD);
+
+	const getFileFrames = (foldFile) => !foldFile.file_frames
+		? [ear.graph.flattenFrame(foldFile, 0)]
+		: Array.from(Array(foldFile.file_frames.length + 1))
+			.map((_, i) => ear.graph.flattenFrame(foldFile, i));
+
 	const loadFOLD = (result) => {
-		origami = result;
-		// update view style according to file type
-		if (origami.frame_classes) {
-			if (origami.frame_classes.includes("creasePattern")) {
-				perspective = "orthographic";
-				viewClass = "creasePattern";
-			} else if (origami.frame_classes.includes("foldedForm")) {
-				perspective = "perspective";
-				viewClass = "foldedForm";
-			}
-		}
+		FOLD = result;
+		selectedFrame = 0;
 	};
-
-	// load example on start
-	onMount(() => loadFOLD(JSON.parse(craneCP)));
-
 </script>
 
 <main>
-	<WebGLView {origami} {viewClass} {perspective} {strokeWidth} {opacity} {fov} />
+	<WebGLView
+		origami={frames[selectedFrame]}
+		{viewClass}
+		{perspective}
+		{strokeWidth}
+		{opacity}
+		{fov}
+	/>
 	<Settings
+		frames={frames}
+		bind:selectedFrame={selectedFrame}
 		bind:perspective={perspective}
 		bind:viewClass={viewClass}
 		bind:strokeWidth={strokeWidth}
 		bind:opacity={opacity}
 		bind:fov={fov}
 		{loadFOLD}
-		{origami}
-		/>
+		origami={frames[selectedFrame]}
+	/>
 </main>
 
 <style>

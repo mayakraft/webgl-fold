@@ -1,3 +1,12 @@
+const uniformFunc = (gl, i, func, value) => {
+	switch (func) {
+		case "uniformMatrix4fv": gl[func](i, false, value); break;
+		// case "uniform1f":
+		// case "uniform2fv":
+		// case "uniform3fv":
+		default: gl[func](i, value); break;
+	}
+}
 /**
  * @param {object} gl a link to the WebGL instance
  * @param {number} version 1 or 2, which WebGL version.
@@ -13,7 +22,8 @@ export const drawProgram = (gl, version, shader, uniforms = {}) => {
 		const uniformName = gl.getActiveUniform(shader.program, i).name;
 		const uniform = uniforms[uniformName];
 		if (uniform) {
-			uniform.setter(gl.getUniformLocation(shader.program, uniformName), uniform.value);
+			const index = gl.getUniformLocation(shader.program, uniformName);
+			uniformFunc(gl, index, uniform.func, uniform.value);
 		}
 	}
 	// set vertex arrays

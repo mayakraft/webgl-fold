@@ -1,0 +1,20 @@
+.Settings {
+  background-color: #0002;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0.5rem;
+}
+
+/*
+h3 {
+  margin: 0;
+  padding: 0;
+
+}
+input[type=text] {
+  width: 3rem;
+}
+.small { font-size: 0.8rem; }
+*/

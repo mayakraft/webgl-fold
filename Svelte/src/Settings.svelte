@@ -1,6 +1,7 @@
 <script>
 	import ear from "rabbit-ear";
 	import { onMount } from "svelte";
+	import FileInfo from "./FileInfo.svelte";
 
 	// example FOLD files
 	import craneCP from "../../fold/crane-cp.fold?raw";
@@ -26,6 +27,7 @@
 	export let strokeWidth = 0.0025;
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
+	export let flipCameraZ = false;
 	export let frontColor = "#5580ff";
 	export let backColor = "#fff";
 	export let loadFOLD = () => {};
@@ -123,8 +125,6 @@
 
 	<h3>file info</h3>
 
-	<p>V: <b>{ear.graph.count.vertices(origami)}</b>, E: <b>{ear.graph.count.edges(origami)}</b>, F: <b>{ear.graph.count.faces(origami)}</b></p>
-
 	{#if frames.length > 1}
 		<p>
 			frame: <span class="value">{selectedFrame+1}/{frames.length}</span>
@@ -133,6 +133,8 @@
 			<input type="range" min={0} max={frames.length - 1} step="1" bind:value={selectedFrame}/>
 		</div>
 	{/if}
+
+	<FileInfo FOLD={origami} {frames} {selectedFrame} />
 
 	<hr />
 
@@ -156,6 +158,7 @@
 		<span>field of view:</span><input type="text" placeholder="field of view" bind:value={fov}>
 		<br/>
 	{/if}
+	<span>flip over</span><input type="checkbox" bind:checked={flipCameraZ} />
 
 	<hr />
 
@@ -203,6 +206,9 @@
 	}
 	input[type=text] {
 		width: 4rem;
+	}
+	span + input[type=text] {
+		margin-left: 0.5rem;
 	}
 	.small { font-size: 0.8rem; }
 </style>

@@ -13,7 +13,8 @@
 	import {
 		rebuildViewport,
 		makeProjectionMatrix,
-		makeViewMatrix,
+		makeViewMatrixFront,
+		makeViewMatrixBack,
 		makeModelMatrix,
 	} from "../../src/general";
 
@@ -23,6 +24,7 @@
 	export let fov = 30;
 	export let strokeWidth = 0.0025;
 	export let opacity = 1.0;
+	export let flipCameraZ = false;
 	export let frontColor = "#5580ff";
 	export let backColor = "#fff";
 
@@ -81,7 +83,7 @@
 		rebuildViewport(gl, canvas);
 		rebuildShaders(origami);
 		projectionMatrix = makeProjectionMatrix(canvas, perspective, fov);
-		viewMatrix = makeViewMatrix();
+		viewMatrix = flipCameraZ ? makeViewMatrixBack() : makeViewMatrixFront();
 		modelMatrix = makeModelMatrix(origami);
 		draw();
 	};
@@ -93,7 +95,7 @@
 	};
 
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
-	$: rebuildAllAndDraw(origami, viewClass, perspective);
+	$: rebuildAllAndDraw(origami, viewClass, perspective, flipCameraZ);
 	$: draw(strokeWidth, opacity, frontColor, backColor);
 
 	onMount(() => {

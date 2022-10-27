@@ -14,6 +14,7 @@
 	let strokeWidth = 0.0025;
 	let opacity = 1.0;
 	let fov = 45;
+	let flipCameraZ = false;
 	let frontColor = "#5580ff";
 	let backColor = "#fff";
 
@@ -38,6 +39,7 @@
 		{strokeWidth}
 		{opacity}
 		{fov}
+		{flipCameraZ}
 		{frontColor}
 		{backColor}
 	/>
@@ -49,6 +51,7 @@
 		bind:strokeWidth={strokeWidth}
 		bind:opacity={opacity}
 		bind:fov={fov}
+		bind:flipCameraZ={flipCameraZ}
 		bind:frontColor={frontColor}
 		bind:backColor={backColor}
 		{loadFOLD}

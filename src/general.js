@@ -34,7 +34,8 @@ export const makeProjectionMatrix = (canvas, perspective = "perspective", fov = 
 		: ear.math.makePerspectiveMatrix4(fov * Math.PI / 180, canvasDimensions[0] / canvasDimensions[1], Z_NEAR, Z_FAR);
 };
 
-export const makeViewMatrix = () => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1.85, 1];
+export const makeViewMatrixFront = () => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1.85, 1];
+export const makeViewMatrixBack = () => [-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1.85, 1];
 // const makeViewMatrix = () => ear.math.invertMatrix4(ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, 1, 1]));
 /**
  * @description build an aspect-fit model matrix (possibly an inverse-model matrix)

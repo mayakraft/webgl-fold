@@ -5,6 +5,8 @@
 
 	// the origami (FOLD object)
 	let FOLD = {};
+	// file_frames, the first element [0] is the top layer frame itself.
+	// even if a file_frames key does not exist, [0] will be filled.
 	let frames = [];
 	let selectedFrame = 0;
 
@@ -18,8 +20,6 @@
 	let frontColor = "#5580ff";
 	let backColor = "#fff";
 
-	$: frames = getFileFrames(FOLD);
-
 	const getFileFrames = (foldFile) => !foldFile.file_frames
 		? [ear.graph.flattenFrame(foldFile, 0)]
 		: Array.from(Array(foldFile.file_frames.length + 1))
@@ -29,6 +29,8 @@
 		FOLD = result;
 		selectedFrame = 0;
 	};
+
+	$: frames = getFileFrames(FOLD);
 </script>
 
 <main>

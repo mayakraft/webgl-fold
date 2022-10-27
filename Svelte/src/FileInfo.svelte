@@ -51,14 +51,6 @@
 		</p>
 	{/if}
 
-	<!-- <hr /> -->
-
-	<!--
-	{#if FOLD.file_frames}
-		<p>frames: <span class="value">{FOLD.file_frames.length}</span></p>
-	{/if}
-	 -->
-
 	{#if frame.frame_title}
 		<p>frame title: <span class="value">{frame.frame_title}</span></p>
 	{/if}

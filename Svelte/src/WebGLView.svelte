@@ -174,7 +174,6 @@
 	const onMove = (e) => {
 		e.preventDefault();
 		const devicePixelRatio = window.devicePixelRatio || 1;
-		// console.log("projectedTouch", projectedTouch);
 		if (!pressVector) { 
 			touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
 			projectedTouch = vectorFromScreenLocation(

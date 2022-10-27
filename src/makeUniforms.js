@@ -1,7 +1,18 @@
 import ear from "rabbit-ear";
 
+const hexColorToRGB = (value) => {
+	const numbersOnly = value.replace(/#(?=\S)/g, '');
+	const hexString = numbersOnly.length === 3
+		? [0, 0, 1, 1, 2, 2].map(i => numbersOnly[i]).join("")
+		: numbersOnly;
+	const c = parseInt(hexString, 16);
+	return [(c >> 16) & 255, (c >> 8) & 255, c & 255]
+		.map(n => n / 255);
+};
+
 const makeUniforms = (gl, { projectionMatrix, viewMatrix, modelMatrix,
-	strokeWidth, opacity, touchPoint, canvas, projectedTouch }) => ({
+	strokeWidth, opacity, touchPoint, canvas, frontColor, backColor,
+	projectedTouch }) => ({
 	u_matrix: {
 		func: "uniformMatrix4fv",
 		value: ear.math.multiplyMatrices4(ear.math
@@ -41,6 +52,14 @@ const makeUniforms = (gl, { projectionMatrix, viewMatrix, modelMatrix,
 		func: "uniform2fv",
 		value: [canvas.clientWidth, canvas.clientHeight]
 			.map(n => n * window.devicePixelRatio || 1),
+	},
+	u_frontColor: {
+		func: "uniform3fv",
+		value: hexColorToRGB(frontColor),
+	},
+	u_backColor: {
+		func: "uniform3fv",
+		value: hexColorToRGB(backColor),
 	},
 	u_projectedTouch: {
 		func: "uniform3fv",

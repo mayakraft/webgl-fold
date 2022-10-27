@@ -3,6 +3,8 @@
 // uniform mat4 u_projection;
 uniform mat4 u_modelView;
 uniform mat4 u_matrix;
+uniform vec3 u_frontColor;
+uniform vec3 u_backColor;
 
 in vec3 v_position;
 in vec3 v_normal;
@@ -37,6 +39,6 @@ void main () {
 	float grayZ = abs(normal_color.z);
 	float gray = 0.25 + clamp(grayY, 1.0, 0.25) * 0.5 + grayX * 0.25 + grayZ * 0.25;
 	float c = clamp(gray, 0.0, 1.0);
-	front_color = vec3(c * 0.333, c * 0.5, c);
-	back_color = vec3(c, c, c);
+	front_color = u_frontColor * c;
+	back_color = u_backColor * c;
 }

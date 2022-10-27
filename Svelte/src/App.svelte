@@ -14,6 +14,8 @@
 	let strokeWidth = 0.0025;
 	let opacity = 1.0;
 	let fov = 45;
+	let frontColor = "#5580ff";
+	let backColor = "#fff";
 
 	$: frames = getFileFrames(FOLD);
 
@@ -36,6 +38,8 @@
 		{strokeWidth}
 		{opacity}
 		{fov}
+		{frontColor}
+		{backColor}
 	/>
 	<Settings
 		frames={frames}
@@ -45,6 +49,8 @@
 		bind:strokeWidth={strokeWidth}
 		bind:opacity={opacity}
 		bind:fov={fov}
+		bind:frontColor={frontColor}
+		bind:backColor={backColor}
 		{loadFOLD}
 		origami={frames[selectedFrame]}
 	/>

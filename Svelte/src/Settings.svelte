@@ -9,8 +9,8 @@
 	import bird3d from "../../fold/bird-3d.fold?raw";
 	import moosers3d from "../../fold/moosers-train-3d.fold?raw";
 	import blintzFrames from "../../fold/blintz-frames.fold?raw";
-	import huffman from "../../fold/huffman.fold?raw";
-	import mazeFolding from "../../fold/maze-folding.fold?raw";
+	// import huffman from "../../fold/huffman.fold?raw";
+	// import mazeFolding from "../../fold/maze-folding.fold?raw";
 	import polygami from "../../fold/polygami.fold?raw";
 	import squareTwist from "../../fold/square-twist-frames.fold?raw";
 	import threeFold from "../../fold/three-fold.fold?raw";
@@ -26,14 +26,17 @@
 	export let strokeWidth = 0.0025;
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
+	export let frontColor = "#5580ff";
+	export let backColor = "#fff";
 	export let loadFOLD = () => {};
 
 	let files;
 	let selectedExample;
 
 	const exampleData = {
-		craneCP, craneCP100, craneFolded, bird3d, moosers3d, blintzFrames, huffman,
-		mazeFolding, polygami, squareTwist, threeFold, kraftBird, waterbomb3D,
+		craneCP, craneCP100, craneFolded, bird3d, moosers3d, blintzFrames,
+		polygami, squareTwist, threeFold, kraftBird, waterbomb3D,
+		// huffman, mazeFolding, 
 	};
 	const examples = [
 		{ text: "cp: crane 1x", data: "craneCP" },
@@ -46,8 +49,8 @@
 		{ text: "folded: 3D waterbomb (rotate it)", data: "waterbomb3D" },
 		{ text: "folded: 3D flapping bird", data: "bird3d" },
 		{ text: "folded: 3D moser's train", data: "moosers3d" },
-		{ text: "folded: 3D huffman", data: "huffman" },
-		{ text: "folded: 3D maze folding", data: "mazeFolding" },
+		// { text: "folded: 3D huffman", data: "huffman" },
+		// { text: "folded: 3D maze folding", data: "mazeFolding" },
 		{ text: "folded: 3D polygami", data: "polygami" },
 
 		{ text: "frames: blintz base", data: "blintzFrames" },
@@ -177,6 +180,9 @@
 	{/if}
 	{#if viewClass === "foldedForm"}
 		<span>opacity</span><input type="range" min="0" max="1" step="0.01" bind:value={opacity} />
+		<br />
+		<span>front</span><input type="text" bind:value={frontColor} />
+		<span>back</span><input type="text" bind:value={backColor} />
 	{/if}
 
 </div>
@@ -196,7 +202,7 @@
 
 	}
 	input[type=text] {
-		width: 3rem;
+		width: 4rem;
 	}
 	.small { font-size: 0.8rem; }
 </style>

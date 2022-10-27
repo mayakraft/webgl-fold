@@ -23,6 +23,9 @@
 	export let fov = 30;
 	export let strokeWidth = 0.0025;
 	export let opacity = 1.0;
+	export let frontColor = "#5580ff";
+	export let backColor = "#fff";
+
 	const dragSpeed = 3.0;
 	// Svelte will bind these. canvas to <canvas>
 	let canvas;
@@ -47,7 +50,8 @@
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		const uniforms = makeUniforms(gl, {
 			projectionMatrix, viewMatrix, modelMatrix,
-			strokeWidth, opacity, touchPoint, canvas, projectedTouch,
+			strokeWidth, opacity, touchPoint, canvas, frontColor, backColor,
+			projectedTouch,
 		});
 		programs.forEach(program => drawProgram(gl, version, program, uniforms));
 	};
@@ -90,7 +94,7 @@
 
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
 	$: rebuildAllAndDraw(origami, viewClass, perspective);
-	$: draw(strokeWidth, opacity);
+	$: draw(strokeWidth, opacity, frontColor, backColor);
 
 	onMount(() => {
 		canvas.addEventListener("mousedown", onPress, false);

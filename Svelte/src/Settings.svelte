@@ -16,6 +16,7 @@
 	// import mazeFolding from "../../fold/maze-folding.fold?raw";
 	import polygami from "../../fold/polygami.fold?raw";
 	import squareTwist from "../../fold/square-twist-frames.fold?raw";
+	import squareTwists from "../../fold/square-twists.fold?raw";
 	import threeFold from "../../fold/three-fold.fold?raw";
 	import kraftBird from "../../fold/kraft-bird-base-06-mvf.fold?raw";
 	import waterbomb3D from "../../fold/simple-waterbomb-3d.fold?raw";
@@ -39,7 +40,7 @@
 
 	const exampleData = {
 		craneCP, craneCP100, craneFolded, bird3d, moosers3d, blintzFrames,
-		polygami, squareTwist, threeFold, kraftBird, waterbomb3D,
+		polygami, squareTwist, squareTwists, threeFold, kraftBird, waterbomb3D,
 		// huffman, mazeFolding, 
 	};
 	const examples = [
@@ -49,6 +50,7 @@
 
 		{ text: "folded: 2D, simple", data: "threeFold" },
 		{ text: "folded: 2D crane", data: "craneFolded" },
+		{ text: "folded: 2D square twists (currently broken)", data: "squareTwists" },
 
 		{ text: "folded: 3D waterbomb (rotate it)", data: "waterbomb3D" },
 		{ text: "folded: 3D flapping bird", data: "bird3d" },
@@ -58,7 +60,7 @@
 		{ text: "folded: 3D polygami", data: "polygami" },
 
 		{ text: "frames: blintz base", data: "blintzFrames" },
-		{ text: "frames: square twist", data: "squareTwist" },
+		{ text: "frames: 3D square twist", data: "squareTwist" },
 	];
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
@@ -225,5 +227,4 @@
 	span + input[type=text] {
 		margin-left: 0.5rem;
 	}
-	.small { font-size: 0.8rem; }
 </style>

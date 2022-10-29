@@ -3,6 +3,8 @@
 	import { onMount } from "svelte";
 	import FileInfo from "./FileInfo.svelte";
 
+	import { averageEdgeLength } from "../../src/graph/general";
+
 	// example FOLD files
 	import craneCP from "../../fold/crane-cp.fold?raw";
 	import craneCP100 from "../../fold/crane-cp-100.fold?raw";
@@ -42,7 +44,7 @@
 	};
 	const examples = [
 		{ text: "cp: crane 1x", data: "craneCP" },
-		{ text: "cp: crane 100x (change stroke width)", data: "craneCP100" },
+		{ text: "cp: crane 100x", data: "craneCP100" },
 		{ text: "cp: bird", data: "kraftBird" },
 
 		{ text: "folded: 2D, simple", data: "threeFold" },
@@ -82,6 +84,16 @@
 				viewClass = "foldedForm";
 			}
 		}
+		if (origami) {
+			// find a decent stroke width
+			// (do this even if we cannot infer creasePattern from frame_classes)
+			const avgEdgeLen = averageEdgeLength(origami);
+			// console.log("average edge length", avgEdgeLen);
+			// invert this: Math.pow(2, strokeWidthSlider) / 100000;
+			strokeWidthSlider = !avgEdgeLen
+				? 0.1
+				: Math.log2((avgEdgeLen * 0.02) * 100000);
+		}
 	};
 
 	$: updateViewSettings(origami);
@@ -101,6 +113,9 @@
 			reader.readAsText(files[0]);
 		}
 	}
+
+	let strokeWidthSlider = 5;
+	$: strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
 
 </script>
 
@@ -179,7 +194,7 @@
 	<label for="radio-view-class-folded-form">folded form</label>
 	<br />
 	{#if viewClass === "creasePattern"}
-		<span>stroke width</span><input type="range" min="0.001" max="0.2" step="0.001" bind:value={strokeWidth} />
+		<span>stroke width</span><input type="range" min="1" max="20" step="0.01" bind:value={strokeWidthSlider} />
 	{/if}
 	{#if viewClass === "foldedForm"}
 		<span>opacity</span><input type="range" min="0" max="1" step="0.01" bind:value={opacity} />

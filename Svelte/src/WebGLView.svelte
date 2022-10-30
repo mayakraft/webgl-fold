@@ -23,6 +23,7 @@
 	export let viewClass = "creasePattern";
 	export let fov = 30;
 	export let strokeWidth = 0.0025;
+	export let layerNudge = 1e-5;
 	export let opacity = 1.0;
 	export let flipCameraZ = false;
 	export let frontColor = "#5580ff";
@@ -67,7 +68,7 @@
 				programs.push(...CreasePattern(gl, version, graph));
 				break;
 			case "foldedForm":
-				programs.push(...FoldedForm(gl, version, graph));
+				programs.push(...FoldedForm(gl, version, graph, { layerNudge }));
 				break;
 			default: break;
 		}
@@ -88,12 +89,18 @@
 		draw();
 	};
 
+	const rebuildModelAndDraw = () => {
+		rebuildShaders(origami);
+		draw();
+	};
+
 	const rebuildProjectionAndDraw = () => {
 		rebuildViewport(gl, canvas);
 		projectionMatrix = makeProjectionMatrix(canvas, perspective, fov);
 		draw();
 	};
 
+	$: rebuildModelAndDraw(layerNudge);
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
 	$: rebuildAllAndDraw(origami, viewClass, perspective, flipCameraZ);
 	$: draw(strokeWidth, opacity, frontColor, backColor);

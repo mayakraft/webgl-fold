@@ -8,8 +8,9 @@ import {
 	nudgeVerticesWithFacesLayer,
 } from "../graph/nudgeVertices";
 
-// const Z_SPACE = 1e-5;
-const Z_SPACE = 12e-6;
+// const LAYER_NUDGE = 1e-4;
+const LAYER_NUDGE = 1e-5;
+// const LAYER_NUDGE = 12e-6;
 
 /**
  * get one point from each face
@@ -99,6 +100,11 @@ const makeElementArrays = (gl, version = 1, graph = {}) => {
 };
 
 const WebGLFoldedForm = (gl, version = 1, graph = {}, options = {}) => {
+	// get options, if they exist
+	const layerNudge = options.layerNudge === undefined
+		? LAYER_NUDGE
+		: options.layerNudge;
+
 	const exploded = JSON.parse(JSON.stringify(graph));
 	// we render "J" joined edges differently from all others. if edges_assignment
 	// doesn't exist, make it with all assignments set to "U".
@@ -125,7 +131,7 @@ const WebGLFoldedForm = (gl, version = 1, graph = {}, options = {}) => {
 			const nudge = faces_nudge[oldFace];
 			if (!nudge) { return; }
 			exploded.faces_vertices[face].forEach(v => {
-				const vec = ear.math.scale(nudge.vector, nudge.layer * Z_SPACE);
+				const vec = ear.math.scale(nudge.vector, nudge.layer * layerNudge);
 				exploded.vertices_coords[v] = ear.math.add(
 					ear.math.resize(3, exploded.vertices_coords[v]),
 					vec,

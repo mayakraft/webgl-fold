@@ -19,6 +19,7 @@
 	let flipCameraZ = false;
 	let frontColor = "#5580ff";
 	let backColor = "#fff";
+	let layerNudge = 1e-5;
 
 	const getFileFrames = (foldFile) => !foldFile.file_frames
 		? [ear.graph.flattenFrame(foldFile, 0)]
@@ -39,6 +40,7 @@
 		{viewClass}
 		{perspective}
 		{strokeWidth}
+		{layerNudge}
 		{opacity}
 		{fov}
 		{flipCameraZ}
@@ -51,6 +53,7 @@
 		bind:perspective={perspective}
 		bind:viewClass={viewClass}
 		bind:strokeWidth={strokeWidth}
+		bind:layerNudge={layerNudge}
 		bind:opacity={opacity}
 		bind:fov={fov}
 		bind:flipCameraZ={flipCameraZ}

@@ -28,6 +28,7 @@
 	export let perspective = "orthographic";
 	export let viewClass = "creasePattern";
 	export let strokeWidth = 0.0025;
+	export let layerNudge = 1e-5;
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
 	export let flipCameraZ = false;
@@ -119,6 +120,9 @@
 	let strokeWidthSlider = 5;
 	$: strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
 
+	let layerNudgeSlider = 5;
+	$: layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+
 </script>
 
 <div class="settings">
@@ -205,6 +209,16 @@
 		<span>back</span><input type="text" bind:value={backColor} />
 	{/if}
 
+	{#if viewClass === "foldedForm" && origami !== undefined}
+		{#if origami.faceOrders || origami.faces_layer}
+			<hr />
+			<h3>overlapping faces</h3>
+			<span>explode layers</span><input type="range" min="1" max="20" step="0.01" bind:value={layerNudgeSlider} />
+			<br />
+			<input type="text" class="long-input" bind:value={layerNudge} />
+		{/if}
+	{/if}
+
 </div>
 
 <style>
@@ -224,6 +238,7 @@
 	input[type=text] {
 		width: 4rem;
 	}
+	input[type=text].long-input { width: 8rem; }
 	span + input[type=text] {
 		margin-left: 0.5rem;
 	}

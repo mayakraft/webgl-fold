@@ -8,7 +8,6 @@
 	export let origami = {};
 	export let frames = [];
 	export let selectedFrame = 0;
-
 	export let perspective = "orthographic";
 	export let viewClass = "creasePattern";
 	export let strokeWidth = 0.0025;
@@ -19,6 +18,7 @@
 	export let frontColor = "#57f";
 	export let backColor = "#fff";
 	export let showFoldedCreases = false;
+	export let showFoldedFaces = true;
 	export let showFoldedFaceOutlines = true;
 	export let loadFOLD = () => {};
 
@@ -186,8 +186,21 @@
 	<!-- folded form edge style -->
 	{#if viewClass === "foldedForm"}
 		<br/>
+		<span>show faces</span>
+		<input
+			type="checkbox"
+			bind:checked={showFoldedFaces} />
+		<br/>
+		<span>face outlines</span>
+		<input
+			type="checkbox"
+			bind:checked={showFoldedFaceOutlines}
+			disabled={!showFoldedFaces} />
+		<br/>
 		<span>show creases</span>
-		<input type="checkbox" bind:checked={showFoldedCreases} />
+		<input
+			type="checkbox"
+			bind:checked={showFoldedCreases} />
 		<br/>
 		<span>stroke width</span><input
 			type="range"
@@ -197,8 +210,6 @@
 			bind:value={strokeWidthSlider}
 			disabled={!showFoldedCreases} />
 		<br/>
-		<span>face outlines</span>
-		<input type="checkbox" bind:checked={showFoldedFaceOutlines} />
 	{/if}
 	<!-- nudge layers for origami with layer orders -->
 	{#if viewClass === "foldedForm" && origami !== undefined}

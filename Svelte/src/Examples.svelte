@@ -54,8 +54,8 @@
 	];
 
 	// load example on start
-	onMount(() => selectedExample = "craneCP");
-	// onMount(() => selectedExample = "polygami");
+	// onMount(() => selectedExample = "craneCP");
+	onMount(() => selectedExample = "craneFolded");
 	// onMount(() => selectedExample = "threeFold");
 
 </script>

@@ -19,6 +19,7 @@
 	export let frontColor = "#5580ff";
 	export let backColor = "#fff";
 	export let showFoldedCreases = false;
+	export let showFoldedFaces = true;
 	export let showFoldedFaceOutlines = true;
 
 	const dragSpeed = 3.0;
@@ -58,6 +59,7 @@
 			layerNudge,
 			outlines: showFoldedFaceOutlines,
 			edges: showFoldedCreases,
+			faces: showFoldedFaces,
 		};
 		programs = [...ear.webgl[viewClass](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));
@@ -88,7 +90,7 @@
 		draw();
 	};
 
-	$: rebuildModelAndDraw(layerNudge, showFoldedCreases, showFoldedFaceOutlines);
+	$: rebuildModelAndDraw(layerNudge, showFoldedCreases, showFoldedFaces, showFoldedFaceOutlines);
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
 	$: rebuildAllAndDraw(origami, viewClass, perspective, flipCameraZ);
 	$: draw(strokeWidth, opacity, frontColor, backColor);

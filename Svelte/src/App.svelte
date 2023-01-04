@@ -21,13 +21,12 @@
 	let frontColor = "#57f";
 	let backColor = "#fff";
 	let showFoldedCreases = false;
+	let showFoldedFaces = true;
 	let showFoldedFaceOutlines = true;
 	let layerNudge = 1e-5;
 
 	const solver3dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
-		// const prepare = ear.layer.prepare(graph);
-		// console.log("prepare", prepare);
 		const solutions = ear.layer.solver3d(graph);
 		console.log("solutions", solutions);
 		const orders = solutions.map(el => el.faceOrders());
@@ -43,7 +42,7 @@
 		const solver = ear.layer.solver(graph);
 		console.log("solver", solver);
 		return solver.faceOrders;
-	}
+	};
 
 	// $: solver3dLayers(frames[selectedFrame]);
 
@@ -84,6 +83,7 @@
 		{frontColor}
 		{backColor}
 		{showFoldedCreases}
+		{showFoldedFaces}
 		{showFoldedFaceOutlines}
 	/>
 	<Settings
@@ -99,6 +99,7 @@
 		bind:frontColor={frontColor}
 		bind:backColor={backColor}
 		bind:showFoldedCreases={showFoldedCreases}
+		bind:showFoldedFaces={showFoldedFaces}
 		bind:showFoldedFaceOutlines={showFoldedFaceOutlines}
 		{loadFOLD}
 		origami={frames[selectedFrame]}

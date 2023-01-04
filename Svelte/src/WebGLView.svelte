@@ -1,22 +1,12 @@
 <script>
 	import ear from "rabbit-ear";
 	import { onMount, onDestroy } from "svelte";
-
-	import CreasePattern from "../../src/programs/CreasePattern";
-	import FoldedForm from "../../src/programs/FoldedForm";
-	import TouchIndicators from "../../src/programs/TouchIndicators";
 	import makeUniforms from "../../src/makeUniforms";
 	import {
-		drawProgram,
-		deallocProgram,
-	} from "../../src/programs";
-	import {
-		rebuildViewport,
-		makeProjectionMatrix,
 		makeViewMatrixFront,
 		makeViewMatrixBack,
-		makeModelMatrix,
 	} from "../../src/general";
+	// import TouchIndicators from "../../src/programs/TouchIndicators";
 
 	export let origami = {};
 	export let perspective = "orthographic";
@@ -28,6 +18,8 @@
 	export let flipCameraZ = false;
 	export let frontColor = "#5580ff";
 	export let backColor = "#fff";
+	export let showFoldedCreases = false;
+	export let showFoldedFaceOutlines = true;
 
 	const dragSpeed = 3.0;
 	// Svelte will bind these. canvas to <canvas>
@@ -56,36 +48,32 @@
 			strokeWidth, opacity, touchPoint, canvas, frontColor, backColor,
 			projectedTouch,
 		});
-		programs.forEach(program => drawProgram(gl, version, program, uniforms));
+		programs.forEach(program => ear.webgl.drawProgram(gl, version, program, uniforms));
 	};
 
 	const rebuildShaders = (graph) => {
 		if (!gl) { return; }
 		deallocPrograms();
-		programs = [];
-		switch(viewClass) {
-			case "creasePattern":
-				programs.push(...CreasePattern(gl, version, graph));
-				break;
-			case "foldedForm":
-				programs.push(...FoldedForm(gl, version, graph, { layerNudge }));
-				break;
-			default: break;
-		}
+		const options = {
+			layerNudge,
+			outlines: showFoldedFaceOutlines,
+			edges: showFoldedCreases,
+		};
+		programs = [...ear.webgl[viewClass](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));
 	};
 
 	const deallocPrograms = () => {
-		programs.forEach(program => deallocProgram(gl, program));
+		programs.forEach(program => ear.webgl.deallocProgram(gl, program));
 		while (programs.length) { programs.pop(); }
 	};
 
 	const rebuildAllAndDraw = () => {
-		rebuildViewport(gl, canvas);
+		ear.webgl.rebuildViewport(gl, canvas);
 		rebuildShaders(origami);
-		projectionMatrix = makeProjectionMatrix(canvas, perspective, fov);
+		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, perspective, fov);
 		viewMatrix = flipCameraZ ? makeViewMatrixBack() : makeViewMatrixFront();
-		modelMatrix = makeModelMatrix(origami);
+		modelMatrix = ear.webgl.makeModelMatrix(origami);
 		draw();
 	};
 
@@ -95,12 +83,12 @@
 	};
 
 	const rebuildProjectionAndDraw = () => {
-		rebuildViewport(gl, canvas);
-		projectionMatrix = makeProjectionMatrix(canvas, perspective, fov);
+		ear.webgl.rebuildViewport(gl, canvas);
+		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, perspective, fov);
 		draw();
 	};
 
-	$: rebuildModelAndDraw(layerNudge);
+	$: rebuildModelAndDraw(layerNudge, showFoldedCreases, showFoldedFaceOutlines);
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
 	$: rebuildAllAndDraw(origami, viewClass, perspective, flipCameraZ);
 	$: draw(strokeWidth, opacity, frontColor, backColor);

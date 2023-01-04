@@ -12,54 +12,13 @@ import {
 const LAYER_NUDGE = 1e-5;
 // const LAYER_NUDGE = 12e-6;
 
-/**
- * get one point from each face
- */
-const makeFacesPoint = (graph) => graph.faces_vertices
-	.map(fv => graph.vertices_coords[fv[0]]);
-
-// add two 3D vectors, store result in first parameter
-const add3 = (a, b) => { a[0] += b[0]; a[1] += b[1]; a[2] += b[2]; };
-
-const makeVertexNormals = (graph) => {
-	const faces_normals = ear.graph.makeFacesNormal(graph);
-	const vertices_normals = graph.vertices_coords.map(() => [0, 0, 0]);
-	graph.faces_vertices
-		.forEach((vertices, f) => vertices
-			.forEach(v => add3(vertices_normals[v], faces_normals[f])));
-	return vertices_normals.map(v => ear.math.normalize3(v));
-};
-
-const makeVertexArrays = (gl, program, graph, change, options = {}) => {
+const makeVertexArrays = (gl, program, graph, options = {}) => {
 	if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return []; }
-	const vertices_coords = graph.vertices_coords
-		.map(coord => [...coord].concat(Array(3 - coord.length).fill(0)));
-	const vertices_normals = makeVertexNormals(graph);
-	const barycentric = vertices_coords
-		.map((_, i) => i % 3)
-		.map(n => [n === 0 ? 1 : 0, n === 1 ? 1 : 0, n === 2 ? 1 : 0]);
-	// // const rawEdges = graph.faces_rawEdge.flatMap(n => [n, n, n]);
-	// const rawEdges = graph.faces_rawEdge;
-	// // console.log("bary", barycentric, rawEdges);
-	const facesEdgesIsJoined = graph.faces_edges
-		.map(edges => edges
-			.map(e => graph.edges_assignment[e])
-			.map(a => a === "J" || a === "j"));
-
-	if (!options.showTrianglulation) {
-		for (let i = 0; i < facesEdgesIsJoined.length; i += 1) {
-			if (facesEdgesIsJoined[i][0]) {
-				barycentric[i * 3 + 0][2] = barycentric[i * 3 + 1][2] = 100;
-			}
-			if (facesEdgesIsJoined[i][1]) {
-				barycentric[i * 3 + 1][0] = barycentric[i * 3 + 2][0] = 100;
-			}
-			if (facesEdgesIsJoined[i][2]) {
-				barycentric[i * 3 + 0][1] = barycentric[i * 3 + 2][1] = 100;
-			}
-		}
-	}
-	// console.log("rawEdges.flat()", new Uint32Array(rawEdges.flat()));
+	const {
+		vertices_coords,
+		vertices_normal,
+		vertices_barycentric,
+	} = ear.webgl.makeFacesVertexData(graph, options);
 	return [
 		{ location: gl.getAttribLocation(program, "v_position"),
 			buffer: gl.createBuffer(),
@@ -69,13 +28,13 @@ const makeVertexArrays = (gl, program, graph, change, options = {}) => {
 		{ location: gl.getAttribLocation(program, "v_normal"),
 			buffer: gl.createBuffer(),
 			type: gl.FLOAT,
-			length: vertices_normals[0].length,
-			data: new Float32Array(vertices_normals.flat()) },
+			length: vertices_normal[0].length,
+			data: new Float32Array(vertices_normal.flat()) },
 		{ location: gl.getAttribLocation(program, "v_barycentric"),
 			buffer: gl.createBuffer(),
 			type: gl.FLOAT,
 			length: 3,
-			data: new Float32Array(barycentric.flat()) },
+			data: new Float32Array(vertices_barycentric.flat()) },
 		// { location: gl.getAttribLocation(program, "v_rawEdge"),
 		// 	buffer: gl.createBuffer(),
 		// 	type: gl.FLOAT,
@@ -145,7 +104,7 @@ const WebGLFoldedForm = (gl, version = 1, graph = {}, options = {}) => {
 		: ear.webgl.createProgram(gl, vertexShaderV1, fragmentShaderV1);
 	return [{
 		program,
-		vertexArrays: makeVertexArrays(gl, program, exploded, change, options),
+		vertexArrays: makeVertexArrays(gl, program, exploded, options),
 		elementArrays: makeElementArrays(gl, version, exploded, options),
 		flags: [gl.DEPTH_TEST],
 	}];

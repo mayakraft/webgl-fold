@@ -1,9 +1,9 @@
 {
 	"file_spec": 1.1,
+	"file_title": "blintz base",
 	"file_author": "Kraft",
 	"file_classes": ["singleModel", "animation"],
 	"file_re:date": "2018-10-14",
-	"frame_title": "blintz base",
 	"frame_attributes": ["3D"],
 	"frame_classes": ["creasePattern"],
 	"vertices_coords": [

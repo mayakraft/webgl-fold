@@ -1,25 +1,9 @@
 <script>
 	import ear from "rabbit-ear";
-	import { onMount } from "svelte";
 	import FileInfo from "./FileInfo.svelte";
+	// import Examples from "./Examples.svelte";
 
 	import { averageEdgeLength } from "../../src/graph/general";
-
-	// example FOLD files
-	import craneCP from "../../fold/crane-cp.fold?raw";
-	import craneCP100 from "../../fold/crane-cp-100.fold?raw";
-	import craneFolded from "../../fold/crane-folded.fold?raw";
-	import bird3d from "../../fold/bird-3d.fold?raw";
-	import moosers3d from "../../fold/moosers-train-3d.fold?raw";
-	import blintzFrames from "../../fold/blintz-frames.fold?raw";
-	// import huffman from "../../fold/huffman.fold?raw";
-	// import mazeFolding from "../../fold/maze-folding.fold?raw";
-	import polygami from "../../fold/polygami.fold?raw";
-	import squareTwist from "../../fold/square-twist-frames.fold?raw";
-	import squareTwists from "../../fold/square-twists.fold?raw";
-	import threeFold from "../../fold/three-fold.fold?raw";
-	import kraftBird from "../../fold/kraft-bird-base-06-mvf.fold?raw";
-	import waterbomb3D from "../../fold/simple-waterbomb-3d.fold?raw";
 
 	export let origami = {};
 	export let frames = [];
@@ -32,37 +16,13 @@
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
 	export let flipCameraZ = false;
-	export let frontColor = "#5580ff";
+	export let frontColor = "#57f";
 	export let backColor = "#fff";
+	export let showFoldedCreases = false;
+	export let showFoldedFaceOutlines = true;
 	export let loadFOLD = () => {};
 
-	let files;
 	let selectedExample;
-
-	const exampleData = {
-		craneCP, craneCP100, craneFolded, bird3d, moosers3d, blintzFrames,
-		polygami, squareTwist, squareTwists, threeFold, kraftBird, waterbomb3D,
-		// huffman, mazeFolding, 
-	};
-	const examples = [
-		{ text: "cp: crane 1x", data: "craneCP" },
-		{ text: "cp: crane 100x", data: "craneCP100" },
-		{ text: "cp: bird", data: "kraftBird" },
-
-		{ text: "folded: 2D, simple", data: "threeFold" },
-		{ text: "folded: 2D crane", data: "craneFolded" },
-		{ text: "folded: 2D square twists (currently broken)", data: "squareTwists" },
-
-		{ text: "folded: 3D waterbomb (rotate it)", data: "waterbomb3D" },
-		{ text: "folded: 3D flapping bird", data: "bird3d" },
-		{ text: "folded: 3D moser's train", data: "moosers3d" },
-		// { text: "folded: 3D huffman", data: "huffman" },
-		// { text: "folded: 3D maze folding", data: "mazeFolding" },
-		{ text: "folded: 3D polygami", data: "polygami" },
-
-		{ text: "frames: blintz base", data: "blintzFrames" },
-		{ text: "frames: 3D square twist", data: "squareTwist" },
-	];
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
 		try {
@@ -71,9 +31,6 @@
 		}
 		catch (error) { window.alert(error); }
 	};
-
-	// load example on start
-	onMount(() => selectedExample = "craneCP");
 
 	// set the view settings (crease pattern / folded, etc...)
 	// depending on if the FOLD object contains frame_classes.
@@ -91,20 +48,25 @@
 			// find a decent stroke width
 			// (do this even if we cannot infer creasePattern from frame_classes)
 			const avgEdgeLen = averageEdgeLength(origami);
-			// console.log("average edge length", avgEdgeLen);
 			// invert this: Math.pow(2, strokeWidthSlider) / 100000;
 			strokeWidthSlider = !avgEdgeLen
 				? 0.1
 				: Math.log2((avgEdgeLen * 0.02) * 100000);
 		}
+		if (origami) {
+			// find a decent spacing between layers (layerNudge)
+			const bounds = ear.graph.getBoundingBox(origami);
+			if (bounds && bounds.span) {
+				const maxSpan = Math.max(...bounds.span);
+				// layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
+				layerNudgeSlider = Math.log2((maxSpan * 0.0005) * 100000);
+			}
+		}
 	};
 
 	$: updateViewSettings(origami);
 
-	$: selectedExample == null
-		? (() => {})()
-		: loadFOLD(JSON.parse(exampleData[selectedExample]));
-
+	let files;
 	$: if (files) {
 		const file = files[0];
 		let mimeType, filename;
@@ -120,7 +82,7 @@
 	let strokeWidthSlider = 5;
 	$: strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
 
-	let layerNudgeSlider = 5;
+	let layerNudgeSlider = 6;
 	$: layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
 
 </script>
@@ -131,18 +93,8 @@
 
 	<hr />
 
-	<h3>example:</h3>
-	<select value={selectedExample} on:change="{(e) => selectedExample = e.target.value}">
-		{#each examples as example}
-			<option value={example.data}>
-				{example.text}
-			</option>
-		{/each}
-	</select>
-
-	<!-- <button on:click={() => selectedExample = null}>reset</button> -->
-
-	<hr />
+	<!-- <Examples {loadFOLD} bind:selectedExample={selectedExample} />
+	<hr /> -->
 
 	<h3>file info</h3>
 
@@ -151,7 +103,12 @@
 			frame: <span class="value">{selectedFrame+1}/{frames.length}</span>
 		</p>
 		<div>
-			<input type="range" min={0} max={frames.length - 1} step="1" bind:value={selectedFrame}/>
+			<input
+				type="range"
+				min=0
+				max={frames.length - 1}
+				step=1
+				bind:value={selectedFrame}/>
 		</div>
 	{/if}
 
@@ -160,60 +117,100 @@
 	<hr />
 
 	<h3>viewport</h3>
+	<!-- perspective (orthographic/perspective) -->
 	<input
 		type="radio"
+		bind:group={perspective}
 		name="radio-webgl-perspective"
-		value="radio-webgl-perspective-orthographic"
-		on:click={() => perspective = "orthographic"}
-		checked={perspective==="orthographic"}>
+		id="radio-webgl-perspective-orthographic"
+		value="orthographic">
 	<label for="radio-webgl-perspective-orthographic">orthographic</label>
 	<input
 		type="radio"
+		bind:group={perspective}
 		name="radio-webgl-perspective"
-		value="radio-webgl-perspective-perspective"
-		on:click={() => perspective = "perspective"}
-		checked={perspective==="perspective"}>
+		id="radio-webgl-perspective-perspective"
+		value="perspective">
 	<label for="radio-webgl-perspective-perspective">perspective</label>
 	<br />
+	<!-- field of view -->
 	{#if perspective === "perspective"}
-		<span>field of view:</span><input type="text" placeholder="field of view" bind:value={fov}>
+		<span>field of view:</span>
+		<input type="text" placeholder="field of view" bind:value={fov}>
 		<br/>
 	{/if}
-	<span>flip over</span><input type="checkbox" bind:checked={flipCameraZ} />
+	<!-- flip model over -->
+	<span>flip over</span>
+	<input type="checkbox" bind:checked={flipCameraZ} />
 
 	<hr />
 
 	<h3>style</h3>
+	<!-- view style (folded/cp) -->
 	<input
 		type="radio"
 		name="radio-view-class"
-		value="radio-view-class-crease-pattern"
-		on:click={() => viewClass = "creasePattern"}
-		checked={viewClass==="creasePattern"}>
-	<label for="radio-view-class-crease-pattern">crease pattern</label>
+		id="radio-view-class-cp"
+		bind:group={viewClass}
+		value="creasePattern">
+	<label for="radio-view-class-cp">crease pattern</label>
 	<input
 		type="radio"
 		name="radio-view-class"
-		value="radio-view-class-folded-form"
-		on:click={() => viewClass = "foldedForm"}
-		checked={viewClass==="foldedForm"}>
-	<label for="radio-view-class-folded-form">folded form</label>
+		id="radio-view-class-folded"
+		bind:group={viewClass}
+		value="foldedForm">
+	<label for="radio-view-class-folded">folded form</label>
 	<br />
+	<!-- stroke width -->
 	{#if viewClass === "creasePattern"}
-		<span>stroke width</span><input type="range" min="1" max="20" step="0.01" bind:value={strokeWidthSlider} />
+		<span>stroke width</span><input
+			type="range"
+			min="1"
+			max="20"
+			step="0.01"
+			bind:value={strokeWidthSlider} />
 	{/if}
+	<!-- folded form face style -->
 	{#if viewClass === "foldedForm"}
-		<span>opacity</span><input type="range" min="0" max="1" step="0.01" bind:value={opacity} />
+		<span>opacity</span><input
+			type="range"
+			min="0"
+			max="1"
+			step="0.01"
+			bind:value={opacity} />
 		<br />
 		<span>front</span><input type="text" bind:value={frontColor} />
 		<span>back</span><input type="text" bind:value={backColor} />
 	{/if}
-
+	<!-- folded form edge style -->
+	{#if viewClass === "foldedForm"}
+		<br/>
+		<span>show creases</span>
+		<input type="checkbox" bind:checked={showFoldedCreases} />
+		<br/>
+		<span>stroke width</span><input
+			type="range"
+			min="1"
+			max="20"
+			step="0.01"
+			bind:value={strokeWidthSlider}
+			disabled={!showFoldedCreases} />
+		<br/>
+		<span>face outlines</span>
+		<input type="checkbox" bind:checked={showFoldedFaceOutlines} />
+	{/if}
+	<!-- nudge layers for origami with layer orders -->
 	{#if viewClass === "foldedForm" && origami !== undefined}
 		{#if origami.faceOrders || origami.faces_layer}
 			<hr />
 			<h3>overlapping faces</h3>
-			<span>explode layers</span><input type="range" min="1" max="20" step="0.01" bind:value={layerNudgeSlider} />
+			<span>explode layers</span><input
+				type="range"
+				min="1"
+				max="20"
+				step="0.01"
+				bind:value={layerNudgeSlider} />
 			<br />
 			<input type="text" class="long-input" bind:value={layerNudge} />
 		{/if}
@@ -229,11 +226,12 @@
 		top: 0;
 		left: 0;
 		padding: 0.5rem;
+		overflow-y: auto;
+		max-height: calc(100vh - 1rem);
 	}
 	h3 {
 		margin: 0;
 		padding: 0;
-
 	}
 	input[type=text] {
 		width: 4rem;

@@ -1,10 +1,10 @@
 {
 	"file_spec": 1.1,
-	"file_creator": "Rabbit Ear",
+	"file_title": "three fold",
 	"file_author": "Kraft",
+	"file_creator": "Rabbit Ear",
 	"file_classes": ["singleModel"],
 	"frame_attributes": ["2D"],
-	"frame_title": "three fold",
 	"frame_classes": ["foldedForm"],
 	"vertices_coords": [
 		[0.62607055447,1.172217339808],

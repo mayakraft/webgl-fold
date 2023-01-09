@@ -7,8 +7,10 @@
 	import craneFolded from "../../fold/crane-folded.fold?raw";
 	import craneFolded100 from "../../fold/crane-folded-100.fold?raw";
 	import bird3d from "../../fold/bird-3d.fold?raw";
-	import moosers3d from "../../fold/moosers-train-3d.fold?raw";
+	import moosers3d from "../../fold/moosers-train.fold?raw";
+	// import moosers3d from "../../fold/moosers-train-3d.fold?raw";
 	import blintzFrames from "../../fold/blintz-frames.fold?raw";
+	import kabuto from "../../fold/kabuto.fold?raw";
 	// import huffman from "../../fold/huffman.fold?raw";
 	// import mazeFolding from "../../fold/maze-folding.fold?raw";
 	import polygami from "../../fold/polygami.fold?raw";
@@ -27,7 +29,7 @@
 		: loadFOLD(JSON.parse(exampleData[selectedExample]));
 
 	const exampleData = {
-		craneCP, craneCP100, craneFolded, craneFolded100, bird3d, moosers3d, blintzFrames,
+		craneCP, craneCP100, craneFolded, craneFolded100, bird3d, moosers3d, blintzFrames, kabuto,
 		polygami, polygami800, squareTwist, squareTwists, threeFold, kraftBird, waterbomb3D,
 		// huffman, mazeFolding, 
 	};
@@ -49,14 +51,16 @@
 		{ text: "folded: 3D polygami", data: "polygami" },
 		{ text: "folded: 3D polygami 800x", data: "polygami800" },
 
+		{ text: "frames: kabuto", data: "kabuto" },
 		{ text: "frames: blintz base", data: "blintzFrames" },
 		{ text: "frames: 3D square twist", data: "squareTwist" },
 	];
 
 	// load example on start
 	// onMount(() => selectedExample = "craneCP");
-	onMount(() => selectedExample = "craneFolded");
-	// onMount(() => selectedExample = "threeFold");
+	// onMount(() => selectedExample = "craneFolded");
+	// onMount(() => selectedExample = "kabuto");
+	onMount(() => selectedExample = "moosers3d");
 
 </script>
 

@@ -27,13 +27,19 @@
 
 	const solver3dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
-		const solutions = ear.layer.solver3d(graph);
-		console.log("solutions", solutions);
-		const orders = solutions.map(el => el.faceOrders());
-		console.log("orders", orders);
-		const faceOrders = [].concat(...orders);
-		console.log("faceOrders", faceOrders);
-		return faceOrders;
+		const solutions = ear.layer.solver3d(graph, 1e-1);
+		console.log(solutions.count(), "solutions", solutions);
+		const allSolutions = solutions.allSolutions();
+		console.log("allSolutions", allSolutions);
+		const solution = solutions.solution();
+		console.log("solution", solution);
+		return solution;
+		// return solutions.solution(8);
+		// const orders = solutions.map(el => el.faceOrders());
+		// console.log("orders", orders);
+		// const faceOrders = [].concat(...orders);
+		// console.log("faceOrders", faceOrders);
+		// return faceOrders;
 	};
 
 	const solver2dLayers = (graph) => {
@@ -52,6 +58,8 @@
 	// 		.map((_, i) => ear.graph.flattenFrame(foldFile, i));
 
 	const getFileFrames = (foldFile) => {
+		solver3dLayers(foldFile);
+		// solver2dLayers(foldFile);
 		// foldFile.faceOrders = solver3dLayers(foldFile);
 		// foldFile.faceOrders = solver2dLayers(foldFile);
 		return !foldFile.file_frames

@@ -1,7 +1,7 @@
 <script>
 	import ear from "rabbit-ear";
 	import FileInfo from "./FileInfo.svelte";
-	// import Examples from "./Examples.svelte";
+	import Examples from "./Examples.svelte";
 
 	import { averageEdgeLength } from "../../src/graph/general";
 
@@ -93,8 +93,8 @@
 
 	<hr />
 
-	<!-- <Examples {loadFOLD} bind:selectedExample={selectedExample} />
-	<hr /> -->
+	<Examples {loadFOLD} bind:selectedExample={selectedExample} />
+	<hr />
 
 	<h3>file info</h3>
 
@@ -238,7 +238,7 @@
 		left: 0;
 		padding: 0.5rem;
 		overflow-y: auto;
-		max-height: calc(100vh - 1rem);
+		max-height: 100vh;
 	}
 	h3 {
 		margin: 0;

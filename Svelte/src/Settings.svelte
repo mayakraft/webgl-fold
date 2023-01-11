@@ -10,7 +10,7 @@
 	export let viewClass = "creasePattern";
 	export let layerNudge = 1e-5;
 	export let opacity = 1.0;
-	export let fov = Math.PI / 4;
+	export let fov = 30;
 	export let flipCameraZ = false;
 	export let frontColor = "#57f";
 	export let backColor = "#fff";

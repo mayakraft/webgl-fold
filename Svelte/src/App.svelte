@@ -17,7 +17,7 @@
 	let viewClass = "creasePattern"; // "foldedForm"; // "creasePattern";
 	let strokeWidth = 0.0025;
 	let opacity = 1.0;
-	let fov = 45;
+	let fov = 30;
 	let flipCameraZ = false;
 	let frontColor = "#57f";
 	let backColor = "#fff";

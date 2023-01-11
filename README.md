@@ -6,19 +6,24 @@ Render a [FOLD file](https://github.com/edemaine/FOLD/) in an HTML canvas with W
 
 - two drawing styles, one for crease patterns, one for folded models.
 - the crease pattern style features thick lines, computed on a shader.
-- orthographic and perspective
-- basic touch input for panning, rotating
+- the folded model style features the ability to sort layer ordering in accordance with the [FOLD spec](https://github.com/edemaine/fold/blob/main/doc/spec.md#layer-information-faceorders-and-edgeorders)
+- ability to view different [file frames](https://github.com/edemaine/fold/blob/main/doc/spec.md#multiple-frames) if a FOLD file contains them.
+- orthographic, perspective, field of view, touch to pan and rotate
 
-### project structure
+### WebGL
 
-the code itself is located in the `src/` folder. This contains everything related to WebGL programs, shaders, uniforms, drawing, view matrices, and deallocating.
-
-To see the project in action, you want to check out one of the examples. Redundant single-page apps have been created in in popular front-end Javascript libraries including one vanilla JS example.
+All WebGL boilerplate, projection, shaders, and rendering has been incorporated into the Rabbit Ear base project, located in `src/webgl/` in [this repo](https://github.com/robbykraft/Origami/).
 
 ### developers
 
-run `npm i` in the root, then navigate to whichever front end library and run `npm i` again.
+If you would like to include a WebGL origami view canvas on your site, check out the code in one of these three examples:
 
-Then, depending on your front end of choice, run whichever `npm run dev` or `npm run`, whatever the particular library uses.
+- [Svelte](https://github.com/robbykraft/webgl-fold/tree/main/Svelte)
+- [SolidJS](https://github.com/robbykraft/webgl-fold/tree/main/SolidJS)
+- [vanilla Javascript](https://github.com/robbykraft/webgl-fold/tree/main/Vanilla)
 
-unfortunately, this currently requires the nightly build of Rabbit Ear. place it in the corresponding local folder, referenced from package.json (and whichever nested package.json).
+Include [Rabbit Ear](https://rabbitear.org) in your project and copy the code from one of these three example projects to get going.
+
+### license
+
+MIT

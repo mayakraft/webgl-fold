@@ -6,19 +6,9 @@ import {
 	onMount,
 	onCleanup,
 } from "solid-js";
-import CreasePattern from "../../src/programs/CreasePattern";
-import FoldedForm from "../../src/programs/FoldedForm";
-import TouchIndicators from "../../src/programs/TouchIndicators";
-import makeUniforms from "../../src/makeUniforms";
 import {
-	drawProgram,
-	deallocProgram,
-} from "../../src/programs";
-import {
-	rebuildViewport,
-	makeProjectionMatrix,
-	makeViewMatrix,
-	makeModelMatrix,
+	makeViewMatrixFront,
+	makeViewMatrixBack,
 } from "../../src/general";
 
 const WebGLView = (props) => {
@@ -51,64 +41,77 @@ const WebGLView = (props) => {
 	const draw = () => {
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		const uniforms = makeUniforms(gl, {
+		const uniforms = programs.map(prog => prog.makeUniforms(gl, {
 			projectionMatrix, viewMatrix, modelMatrix,
 			strokeWidth: props.strokeWidth(),
 			opacity: props.opacity(),
 			touchPoint, canvas, projectedTouch,
-		});
-		programs.forEach(program => drawProgram(gl, version, program, uniforms));
+			frontColor: props.frontColor(),
+			backColor: props.backColor(),
+		}));
+		programs.forEach((program, i) => ear.webgl.drawProgram(gl, version, program, uniforms[i]));
 	};
 
 	const rebuildShaders = (graph) => {
 		if (!gl) { return; }
 		deallocPrograms();
-		programs = [];
-		switch(props.viewClass()) {
-			case "creasePattern":
-				programs.push(...CreasePattern(gl, version, graph));
-				break;
-			case "foldedForm":
-				programs.push(...FoldedForm(gl, version, graph));
-				break;
-			default: break;
-		}
+		const options = {
+			layerNudge: props.layerNudge(),
+			outlines: props.showFoldedFaceOutlines(),
+			edges: props.showFoldedCreases(),
+			faces: props.showFoldedFaces(),
+		};
+		programs = [...ear.webgl[props.viewClass()](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));
 	};
 
 	const deallocPrograms = () => {
-		programs.forEach(program => deallocProgram(gl, program));
+		programs.forEach(program => ear.webgl.deallocProgram(gl, program));
 		while (programs.length) { programs.pop(); }
 	};
 
 	const rebuildAllAndDraw = () => {
-		rebuildViewport(gl, canvas);
-		rebuildShaders(props.origami());
-		projectionMatrix = makeProjectionMatrix(canvas, props.perspective(), props.fov());
-		viewMatrix = makeViewMatrix();
-		modelMatrix = makeModelMatrix(props.origami());
+		ear.webgl.rebuildViewport(gl, canvas);
+		rebuildShaders(props.origami);
+		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, props.perspective(), props.fov());
+		viewMatrix = props.flipCameraZ() ? makeViewMatrixBack() : makeViewMatrixFront();
+		modelMatrix = ear.webgl.makeModelMatrix(props.origami);
+		draw();
+	};
+
+	const rebuildModelAndDraw = () => {
+		rebuildShaders(props.origami);
 		draw();
 	};
 
 	const rebuildProjectionAndDraw = () => {
-		rebuildViewport(gl, canvas);
-		projectionMatrix = makeProjectionMatrix(canvas, props.perspective(), props.fov());
+		ear.webgl.rebuildViewport(gl, canvas);
+		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, props.perspective(), props.fov());
 		draw();
 	};
 
+	createEffect(() => rebuildModelAndDraw(
+		props.layerNudge(),
+		props.showFoldedCreases(),
+		props.showFoldedFaces(),
+		props.showFoldedFaceOutlines()
+	));
 	createEffect(() => rebuildProjectionAndDraw(
 		innerWidth(),
 		innerHeight(),
 		props.fov(),
 	));
 	createEffect(() => rebuildAllAndDraw(
-		props.origami(),
+		props.origami,
 		props.viewClass(),
 		props.perspective(),
+		props.flipCameraZ(),
 	));
 	createEffect(() => draw(
 		props.strokeWidth(),
 		props.opacity(),
+		props.frontColor(),
+		props.backColor(),
 	));
 
 	onMount(() => {
@@ -189,7 +192,6 @@ const WebGLView = (props) => {
 	const onMove = (e) => {
 		e.preventDefault();
 		const devicePixelRatio = window.devicePixelRatio || 1;
-		// console.log("projectedTouch", projectedTouch);
 		if (!pressVector) { 
 			touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
 			projectedTouch = vectorFromScreenLocation(

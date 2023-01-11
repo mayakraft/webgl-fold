@@ -5,16 +5,18 @@
   top: 0;
   left: 0;
   padding: 0.5rem;
+  overflow-y: auto;
+  max-height: 100vh;
 }
 
-/*
-h3 {
-  margin: 0;
-  padding: 0;
+.ShortInput {
+  width: 4rem;
+}
 
+.LongInput {
+  width: 8rem;
 }
-input[type=text] {
-  width: 3rem;
+
+span + input[type=text] {
+  margin-left: 0.5rem;
 }
-.small { font-size: 0.8rem; }
-*/

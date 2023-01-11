@@ -1,0 +1,24 @@
+.FileInfo {
+	max-width: 15rem;
+}
+.Info {
+	font-size: 0.8rem;
+	line-height: 1rem;
+	word-break: break-word;
+	color: #999;
+}
+.Value {
+	font-weight: bold;
+	color: #ccc;
+}
+.Pill {
+	font-weight: bold;
+	background-color: #36393c;
+	color: #ccc;
+	border-radius: 0.75rem;
+	padding: 0 0.5rem;
+}
+.Warning {
+	background-color: #46493c;
+	color: #fb4;
+}

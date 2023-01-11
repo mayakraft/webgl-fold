@@ -1,13 +1,8 @@
 import ear from "rabbit-ear";
-
 import { createSignal } from "solid-js";
 import styles from "./Settings.module.css";
-
-import craneCP from "../../fold/crane-cp.fold?raw";
-import craneCP100 from "../../fold/crane-cp-100.fold?raw";
-import craneFolded from "../../fold/crane-folded.fold?raw";
-import bird3d from "../../fold/bird-3d.fold?raw";
-import moosers3d from "../../fold/moosers-train-3d.fold?raw";
+import FileInfo from "./FileInfo";
+import Examples from "./Examples";
 
 function Settings(props) {
 
@@ -31,6 +26,44 @@ function Settings(props) {
   return (
     <div class={styles.Settings}>
 
+      <h3>load FOLD</h3>
+      <input type="file" onInput={fileDialogOnInput} />
+
+      <hr />
+
+      <Examples
+        loadFOLD={props.loadFOLD}
+        selectedExample={props.selectedExample}
+        setSelectedExample={props.setSelectedExample}
+      />
+
+      <hr />
+
+      <h3>file info</h3>
+
+      <Show when={props.frames().length > 1}>
+        <p>
+          frame: <span class="value">{props.selectedFrame()+1}/{props.frames().length}</span>
+        </p>
+        <div>
+          <input
+            type="range"
+            min="0"
+            max={props.frames().length - 1}
+            step="1"
+            value={props.selectedFrame()}
+            onInput={e => props.setSelectedFrame(e.target.value)} />
+        </div>
+      </Show>
+
+      <FileInfo
+        FOLD={props.FOLD}
+        frames={props.frames}
+        selectedFrame={props.selectedFrame}
+      />
+
+      <hr />
+
       <h3>viewport</h3>
       <input
         type="radio"
@@ -46,10 +79,13 @@ function Settings(props) {
         onClick={() => props.setPerspective("perspective")}
         checked={props.perspective() === "perspective"} />
       <label for="radio-webgl-perspective-perspective">perspective</label>
+
       <br />
+
       <Show when={props.perspective() === "perspective"}>
         <span>field of view:</span>
         <input
+          class={styles.ShortInput}
           type="text"
           placeholder="field of view"
           value={props.fov()}
@@ -57,6 +93,13 @@ function Settings(props) {
         />
         <br/>
       </Show>
+
+      <span>flip over</span>
+      <input
+        type="checkbox"
+        checked={props.flipCameraZ()}
+        onClick={() => props.setFlipCameraZ(!props.flipCameraZ())}
+      />
 
       <hr />
 
@@ -95,30 +138,77 @@ function Settings(props) {
           step="0.01"
           value={props.opacity()}
           onInput={e => props.setOpacity(e.target.value)} />
+        <br />
+        <span>front</span><input
+          type="text"
+          class={styles.ShortInput}
+          value={props.frontColor()}
+          onInput={(e) => props.setFrontColor(e.target.value)}
+        />
+        <span>back</span><input
+          type="text"
+          class={styles.ShortInput}
+          value={props.backColor()}
+          onInput={(e) => props.setBackColor(e.target.value)}
+        />
       </Show>
 
-      <hr />
-
-      <h3>current FOLD</h3>
-      <p>V: <b>{ear.graph.count.vertices(props.origami())}</b>, E: <b>{ear.graph.count.edges(props.origami())}</b>, F: <b>{ear.graph.count.faces(props.origami())}</b></p>
-
-      <hr />
-
-      <h3>example:</h3>
-      <button onClick={() => props.loadFOLD(JSON.parse(craneCP))}>cp: crane 1x1</button>
-      <br />
-      <button onClick={() => props.loadFOLD(JSON.parse(craneCP100))}>cp: crane 100x100</button>
-      <br />
-      <button onClick={() => props.loadFOLD(JSON.parse(craneFolded))}>folded: 2D crane</button>
-      <br />
-      <button onClick={() => props.loadFOLD(JSON.parse(bird3d))}>folded: 3D bird</button>
-      <br />
-      <button onClick={() => props.loadFOLD(JSON.parse(moosers3d))}>folded: 3D moser's train</button>
-
-      <hr />
-
-      <h3>load FOLD</h3>
-      <input type="file" onInput={fileDialogOnInput} />
+      <Show when={props.viewClass() === "foldedForm"}>
+        <br/>
+        <span>show faces</span>
+        <input
+          type="checkbox"
+          checked={props.showFoldedFaces()}
+          onClick={() => props.setShowFoldedFaces(!props.showFoldedFaces())}
+        />
+        <br/>
+        <span>face outlines</span>
+        <input
+          type="checkbox"
+          checked={props.showFoldedFaceOutlines()}
+          onClick={() => props.setShowFoldedFaceOutlines(!props.showFoldedFaceOutlines())}
+          disabled={!props.showFoldedFaces()}
+        />
+        <br/>
+        <span>show creases</span>
+        <input
+          type="checkbox"
+          checked={props.showFoldedCreases()}
+          onClick={() => props.setShowFoldedCreases(!props.showFoldedCreases())}
+        />
+        <br/>
+        <span>stroke width</span><input
+          type="range"
+          min="1"
+          max="20"
+          step="0.01"
+          value={props.strokeWidthSlider()}
+          onInput={e => props.setStrokeWidthSlider(e.target.value)}
+          disabled={!props.showFoldedCreases()}
+        />
+        <br/>
+      </Show>
+      <Show when={props.viewClass() === "foldedForm" && props.origami !== undefined}>
+        <Show when={props.origami.faceOrders || props.origami.faces_layer}>
+          <hr />
+          <h3>overlapping faces</h3>
+          <span>explode layers</span><input
+            type="range"
+            min="1"
+            max="20"
+            step="0.01"
+            value={props.layerNudgeSlider()}
+            onInput={e => props.setLayerNudgeSlider(e.target.value)}
+          />
+          <br />
+          <input
+            type="text"
+            class={styles.LongInput}
+            value={props.layerNudge()}
+            onInput={(e) => props.setLayerNudge(e.target.value)}
+          />
+        </Show>
+      </Show>
 
     </div>
   );

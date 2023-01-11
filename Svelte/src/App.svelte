@@ -3,6 +3,7 @@
 	import Settings from "./Settings.svelte";
 	import WebGLView from "./WebGLView.svelte";
 	import DragAndDrop from "./DragAndDrop.svelte";
+	import { averageEdgeLength } from "../../src/graph/general";
 
 	// the origami (FOLD object)
 	let FOLD = {};
@@ -27,11 +28,11 @@
 
 	const solver3dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
-		const solutions = ear.layer.solver3d(graph, 1e-1);
+		const solutions = ear.layer.solver(graph);
 		console.log(solutions.count(), "solutions", solutions);
 		const allSolutions = solutions.allSolutions();
 		console.log("allSolutions", allSolutions);
-		const solution = solutions.solution();
+		const solution = solutions.solution([2]);
 		console.log("solution", solution);
 		return solution;
 		// return solutions.solution(8);
@@ -45,12 +46,10 @@
 	const solver2dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
 		ear.graph.populate(graph);
-		const solver = ear.layer.solver(graph);
+		const solver = ear.layer.solver2d(graph);
 		console.log("solver", solver);
 		return solver.faceOrders;
 	};
-
-	// $: solver3dLayers(frames[selectedFrame]);
 
 	// const getFileFrames = (foldFile) => !foldFile.file_frames
 	// 	? [ear.graph.flattenFrame(foldFile, 0)]
@@ -58,7 +57,7 @@
 	// 		.map((_, i) => ear.graph.flattenFrame(foldFile, i));
 
 	const getFileFrames = (foldFile) => {
-		solver3dLayers(foldFile);
+		// solver3dLayers(foldFile);
 		// solver2dLayers(foldFile);
 		// foldFile.faceOrders = solver3dLayers(foldFile);
 		// foldFile.faceOrders = solver2dLayers(foldFile);
@@ -74,6 +73,45 @@
 	};
 
 	$: frames = getFileFrames(FOLD);
+
+	// set the view settings (crease pattern / folded, etc...)
+	// depending on if the FOLD object contains frame_classes.
+	const updateViewSettings = () => {
+		const origami = frames[selectedFrame];
+		if (!origami) { return; }
+		// infer view style if frame_classes exists
+		if (origami.frame_classes) {
+			if (origami.frame_classes.includes("creasePattern")) {
+				perspective = "orthographic";
+				viewClass = "creasePattern";
+			} else if (origami.frame_classes.includes("foldedForm")) {
+				perspective = "perspective";
+				viewClass = "foldedForm";
+			}
+		}
+		// find a decent stroke width
+		// (do this even if we cannot infer creasePattern from frame_classes)
+		const avgEdgeLen = averageEdgeLength(origami);
+		// invert this: Math.pow(2, strokeWidthSlider) / 100000;
+		strokeWidthSlider = !avgEdgeLen
+			? 0.1
+			: Math.log2((avgEdgeLen * 0.02) * 100000);
+		// find a decent spacing between layers (layerNudge)
+		const bounds = ear.graph.getBoundingBox(origami);
+		if (bounds && bounds.span) {
+			const maxSpan = Math.max(...bounds.span);
+			// layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
+			layerNudgeSlider = Math.log2((maxSpan * 0.0005) * 100000);
+		}
+	};
+
+	$: updateViewSettings(frames[selectedFrame]);
+
+	let strokeWidthSlider = 5;
+	$: strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+
+	let layerNudgeSlider = 6;
+	$: layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
 
 </script>
 	
@@ -99,8 +137,6 @@
 		bind:selectedFrame={selectedFrame}
 		bind:perspective={perspective}
 		bind:viewClass={viewClass}
-		bind:strokeWidth={strokeWidth}
-		bind:layerNudge={layerNudge}
 		bind:opacity={opacity}
 		bind:fov={fov}
 		bind:flipCameraZ={flipCameraZ}
@@ -109,6 +145,8 @@
 		bind:showFoldedCreases={showFoldedCreases}
 		bind:showFoldedFaces={showFoldedFaces}
 		bind:showFoldedFaceOutlines={showFoldedFaceOutlines}
+		bind:strokeWidthSlider={strokeWidthSlider}
+		bind:layerNudgeSlider={layerNudgeSlider}
 		{loadFOLD}
 		origami={frames[selectedFrame]}
 	/>

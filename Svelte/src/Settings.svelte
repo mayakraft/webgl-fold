@@ -3,14 +3,11 @@
 	import FileInfo from "./FileInfo.svelte";
 	import Examples from "./Examples.svelte";
 
-	import { averageEdgeLength } from "../../src/graph/general";
-
 	export let origami = {};
 	export let frames = [];
 	export let selectedFrame = 0;
 	export let perspective = "orthographic";
 	export let viewClass = "creasePattern";
-	export let strokeWidth = 0.0025;
 	export let layerNudge = 1e-5;
 	export let opacity = 1.0;
 	export let fov = Math.PI / 4;
@@ -22,6 +19,9 @@
 	export let showFoldedFaceOutlines = true;
 	export let loadFOLD = () => {};
 
+	export let strokeWidthSlider;
+	export let layerNudgeSlider;
+
 	let selectedExample;
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
@@ -31,40 +31,6 @@
 		}
 		catch (error) { window.alert(error); }
 	};
-
-	// set the view settings (crease pattern / folded, etc...)
-	// depending on if the FOLD object contains frame_classes.
-	const updateViewSettings = () => {
-		if (origami.frame_classes) {
-			if (origami.frame_classes.includes("creasePattern")) {
-				perspective = "orthographic";
-				viewClass = "creasePattern";
-			} else if (origami.frame_classes.includes("foldedForm")) {
-				perspective = "perspective";
-				viewClass = "foldedForm";
-			}
-		}
-		if (origami) {
-			// find a decent stroke width
-			// (do this even if we cannot infer creasePattern from frame_classes)
-			const avgEdgeLen = averageEdgeLength(origami);
-			// invert this: Math.pow(2, strokeWidthSlider) / 100000;
-			strokeWidthSlider = !avgEdgeLen
-				? 0.1
-				: Math.log2((avgEdgeLen * 0.02) * 100000);
-		}
-		if (origami) {
-			// find a decent spacing between layers (layerNudge)
-			const bounds = ear.graph.getBoundingBox(origami);
-			if (bounds && bounds.span) {
-				const maxSpan = Math.max(...bounds.span);
-				// layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
-				layerNudgeSlider = Math.log2((maxSpan * 0.0005) * 100000);
-			}
-		}
-	};
-
-	$: updateViewSettings(origami);
 
 	let files;
 	$: if (files) {
@@ -78,12 +44,6 @@
 			reader.readAsText(files[0]);
 		}
 	}
-
-	let strokeWidthSlider = 5;
-	$: strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
-
-	let layerNudgeSlider = 6;
-	$: layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
 
 </script>
 

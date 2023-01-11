@@ -28,39 +28,45 @@
 		? (() => {})()
 		: loadFOLD(JSON.parse(exampleData[selectedExample]));
 
+	// const exampleData = {
+	// 	craneCP, craneCP100, craneFolded, craneFolded100, bird3d, moosers3d, blintzFrames, kabuto,
+	// 	polygami, polygami800, squareTwist, squareTwists, threeFold, kraftBird, waterbomb3D,
+	// 	// huffman, mazeFolding, 
+	// };
 	const exampleData = {
-		craneCP, craneCP100, craneFolded, craneFolded100, bird3d, moosers3d, blintzFrames, kabuto,
-		polygami, polygami800, squareTwist, squareTwists, threeFold, kraftBird, waterbomb3D,
-		// huffman, mazeFolding, 
+		craneCP, craneFolded, bird3d, moosers3d,
+		blintzFrames, kabuto, polygami, kraftBird,
 	};
 	const examples = [
-		{ text: "cp: crane 1x", data: "craneCP" },
-		{ text: "cp: crane 100x", data: "craneCP100" },
-		{ text: "cp: bird", data: "kraftBird" },
+		{ text: "crease pattern: crane", data: "craneCP" },
+		// { text: "cp: crane 1x", data: "craneCP" },
+		// { text: "cp: crane 100x", data: "craneCP100" },
+		{ text: "crease pattern: bird", data: "kraftBird" },
 
-		{ text: "folded: 2D simple", data: "threeFold" },
-		{ text: "folded: 2D crane", data: "craneFolded" },
-		{ text: "folded: 2D crane 100x", data: "craneFolded100" },
-		{ text: "folded: 2D square twists (currently broken)", data: "squareTwists" },
+		// { text: "folded: 2D simple", data: "threeFold" },
+		{ text: "folded: crane", data: "craneFolded" },
+		// { text: "folded: 2D crane 100x", data: "craneFolded100" },
+		// { text: "folded: 2D square twists (currently broken)", data: "squareTwists" },
 
-		{ text: "folded: 3D waterbomb (rotate it)", data: "waterbomb3D" },
-		{ text: "folded: 3D flapping bird", data: "bird3d" },
-		{ text: "folded: 3D moser's train", data: "moosers3d" },
+		// { text: "folded: 3D waterbomb (rotate it)", data: "waterbomb3D" },
+		// { text: "folded: 3D flapping bird", data: "bird3d" },
+		{ text: "folded: Mooser's train", data: "moosers3d" },
 		// { text: "folded: 3D huffman", data: "huffman" },
 		// { text: "folded: 3D maze folding", data: "mazeFolding" },
-		{ text: "folded: 3D polygami", data: "polygami" },
-		{ text: "folded: 3D polygami 800x", data: "polygami800" },
+		{ text: "folded: polygami", data: "polygami" },
+		// { text: "folded: 3D polygami 800x", data: "polygami800" },
 
 		{ text: "frames: kabuto", data: "kabuto" },
 		{ text: "frames: blintz base", data: "blintzFrames" },
-		{ text: "frames: 3D square twist", data: "squareTwist" },
+		// { text: "frames: 3D square twist", data: "squareTwist" },
 	];
 
 	// load example on start
 	// onMount(() => selectedExample = "craneCP");
 	// onMount(() => selectedExample = "craneFolded");
 	// onMount(() => selectedExample = "kabuto");
-	onMount(() => selectedExample = "moosers3d");
+	// onMount(() => selectedExample = "moosers3d");
+	onMount(() => selectedExample = null);
 
 </script>
 

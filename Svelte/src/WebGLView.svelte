@@ -1,12 +1,10 @@
 <script>
 	import ear from "rabbit-ear";
 	import { onMount, onDestroy } from "svelte";
-	import makeUniforms from "../../src/makeUniforms";
 	import {
 		makeViewMatrixFront,
 		makeViewMatrixBack,
 	} from "../../src/general";
-	// import TouchIndicators from "../../src/programs/TouchIndicators";
 
 	export let origami = {};
 	export let perspective = "orthographic";
@@ -44,12 +42,12 @@
 	const draw = () => {
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		const uniforms = makeUniforms(gl, {
+		const uniforms = programs.map(prog => prog.makeUniforms(gl, {
 			projectionMatrix, viewMatrix, modelMatrix,
 			strokeWidth, opacity, touchPoint, canvas, frontColor, backColor,
 			projectedTouch,
-		});
-		programs.forEach(program => ear.webgl.drawProgram(gl, version, program, uniforms));
+		}));
+		programs.forEach((program, i) => ear.webgl.drawProgram(gl, version, program, uniforms[i]));
 	};
 
 	const rebuildShaders = (graph) => {

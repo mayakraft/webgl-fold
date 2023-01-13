@@ -1,12 +1,12 @@
 {
 	"file_spec": 1.1,
-	"file_title": "traditional samurai helmet",
+	"file_title": "Kabuto",
 	"file_author": "Kraft",
-	"file_classes": ["singleModel"],
 	"file_creator": "Rabbit Ear",
-	"file_description": "all nine flap layerings",
+	"file_classes": ["singleModel"],
+	"file_description": "all flap layerings",
+	"frame_classes": ["foldedForm"],
 	"frame_attributes": ["2D"],
-	"frame_classes":["foldedForm"],
 	"vertices_coords":[
 		[0.5,0],[0.5,0.5],[1,0.5],[0.75,0.25],[0.5,0],[1,0.5],[0.75,0.25],[0.5,0.35355339059327323],[0.6464466094067266,0.5],[0.5,0.125],[0.875,0.5],[0.39644660940672627,0.25],[0.75,0.6035533905932738],[0.625,0.125],[0.875,0.375],[0.5,0.35355339059327334],[0.6464466094067267,0.5],[0.5,0.5],[0.625,0.375]
 	],

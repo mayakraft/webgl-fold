@@ -30,9 +30,9 @@
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
 		const solutions = ear.layer.solver(graph);
 		console.log(solutions.count(), "solutions", solutions);
-		const allSolutions = solutions.allSolutions();
-		console.log("allSolutions", allSolutions);
-		const solution = solutions.solution([2]);
+		// const allSolutions = solutions.allSolutions();
+		// console.log("allSolutions", allSolutions);
+		const solution = solutions.solution();
 		console.log("solution", solution);
 		return solution;
 		// return solutions.solution(8);
@@ -147,6 +147,7 @@
 		bind:showFoldedFaceOutlines={showFoldedFaceOutlines}
 		bind:strokeWidthSlider={strokeWidthSlider}
 		bind:layerNudgeSlider={layerNudgeSlider}
+		{layerNudge}
 		{loadFOLD}
 		origami={frames[selectedFrame]}
 	/>

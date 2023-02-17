@@ -47,6 +47,9 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+hr {
+  margin: 0.5rem 0;
+}
 
 @media (prefers-color-scheme: light) {
   :root {

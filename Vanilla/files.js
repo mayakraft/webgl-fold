@@ -35,7 +35,7 @@ const updateViewSettings = () => {
 	const avgEdgeLen = averageEdgeLength(origami);
 	strokeWidth = avgEdgeLen * 0.02;
 	// find a decent spacing between layers (layerNudge)
-	const bounds = ear.graph.getBoundingBox(origami);
+	const bounds = ear.graph.boundingBox(origami);
 	if (bounds && bounds.span) {
 		const maxSpan = Math.max(...bounds.span);
 		layerNudge = maxSpan * 0.0001;

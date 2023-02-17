@@ -1,5 +1,6 @@
 <script>
 	import ear from "rabbit-ear";
+	import GeometryKey from "./GeometryKey.svelte";
 
 	export let FOLD = {};
 	export let frames = [];
@@ -8,7 +9,8 @@
 	const findNonSpecKeys = (fold) => {
 		if (!fold) { return []; }
 		const map = {};
-		ear.graph.foldKeys.forEach(key => { map[key] = true; });
+		Object.values(ear.graph.foldKeys)
+			.forEach(arr => arr.forEach(key => { map[key] = true; }));
 		return Object.keys(fold).filter(key => !map[key]);
 	};
 
@@ -16,9 +18,33 @@
 	$: frame = frames[selectedFrame];
 	let nonSpecKeys = [];
 	$: nonSpecKeys = findNonSpecKeys(frames[selectedFrame]);
+
+	let fileLoaded = false;
+	$: fileLoaded = ear.graph.isFoldObject(FOLD);
+
+	let fileSize = 0;
+	$: fileSize = JSON.stringify(FOLD).length / 1000;
 </script>
 
+{#if fileLoaded}
 <div>
+	<p><span class="value">{fileSize.toFixed(2)}</span> kb</p>
+
+	{#if frames.length > 1}
+		<p>
+			frame: <span class="value">{selectedFrame+1}/{frames.length}</span>
+		</p>
+		<div>
+			<input
+				type="range"
+				min=0
+				max={frames.length - 1}
+				step=1
+				bind:value={selectedFrame}/>
+		</div>
+		<hr />
+	{/if}
+
 
 	<p>vertices: <span class="value">{ear.graph.count.vertices(FOLD)}</span>, edges: <span class="value">{ear.graph.count.edges(FOLD)}</span>, faces: <span class="value">{ear.graph.count.faces(FOLD)}</span></p>
 
@@ -94,9 +120,27 @@
 		</p>
 	{/if}
 
+	<hr />
+
+	<GeometryKey bind:FOLD={FOLD} key={"vertices_coords"} />
+	<GeometryKey bind:FOLD={FOLD} key={"vertices_vertices"} />
+	<GeometryKey bind:FOLD={FOLD} key={"vertices_edges"} />
+	<GeometryKey bind:FOLD={FOLD} key={"vertices_faces"} />
+	<GeometryKey bind:FOLD={FOLD} key={"edges_vertices"} />
+	<GeometryKey bind:FOLD={FOLD} key={"edges_faces"} />
+	<GeometryKey bind:FOLD={FOLD} key={"edges_assignment"} />
+	<GeometryKey bind:FOLD={FOLD} key={"edges_foldAngle"} />
+	<GeometryKey bind:FOLD={FOLD} key={"faces_vertices"} />
+	<GeometryKey bind:FOLD={FOLD} key={"faces_edges"} />
+	<GeometryKey bind:FOLD={FOLD} key={"faces_faces"} />
+	<GeometryKey bind:FOLD={FOLD} key={"faceOrders"} />
 </div>
+{/if}
 
 <style>
+	hr {
+		margin: 0.125rem 0;
+	}
 	div {
 		max-width: 15rem;
 	}

@@ -1,9 +1,9 @@
 <script>
 	import ear from "rabbit-ear";
-	import Settings from "./Settings.svelte";
+	import Settings from "./Settings/Settings.svelte";
 	import WebGLView from "./WebGLView.svelte";
 	import DragAndDrop from "./DragAndDrop.svelte";
-	import { averageEdgeLength } from "../../src/graph/general";
+	import { averageEdgeLength } from "../../src/general";
 
 	// the origami (FOLD object)
 	let FOLD = {};
@@ -29,10 +29,14 @@
 	const solver3dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
 		const solutions = ear.layer.solver(graph);
-		console.log(solutions.count(), "solutions", solutions);
+		console.log("solutions", solutions);
+		// console.log(solutions.count(), "solutions", solutions);
 		// const allSolutions = solutions.allSolutions();
 		// console.log("allSolutions", allSolutions);
-		const solution = solutions.solution();
+		// const solution = solutions.solution();
+		// console.log("solution", solution);
+		// return solution;
+		const solution = solutions.anySolution();
 		console.log("solution", solution);
 		return solution;
 		// return solutions.solution(8);
@@ -51,21 +55,21 @@
 		return solver.faceOrders;
 	};
 
-	// const getFileFrames = (foldFile) => !foldFile.file_frames
-	// 	? [ear.graph.flattenFrame(foldFile, 0)]
-	// 	: Array.from(Array(foldFile.file_frames.length + 1))
-	// 		.map((_, i) => ear.graph.flattenFrame(foldFile, i));
+	const getFileFrames = (foldFile) => !foldFile.file_frames
+		? [ear.graph.flattenFrame(foldFile, 0)]
+		: Array.from(Array(foldFile.file_frames.length + 1))
+			.map((_, i) => ear.graph.flattenFrame(foldFile, i));
 
-	const getFileFrames = (foldFile) => {
-		// solver3dLayers(foldFile);
-		// solver2dLayers(foldFile);
-		// foldFile.faceOrders = solver3dLayers(foldFile);
-		// foldFile.faceOrders = solver2dLayers(foldFile);
-		return !foldFile.file_frames
-			? [ear.graph.flattenFrame(foldFile, 0)]
-			: Array.from(Array(foldFile.file_frames.length + 1))
-				.map((_, i) => ear.graph.flattenFrame(foldFile, i));
-	};
+	// const getFileFrames = (foldFile) => {
+	// 	// solver3dLayers(foldFile);
+	// 	// solver2dLayers(foldFile);
+	// 	// foldFile.faceOrders = solver3dLayers(foldFile);
+	// 	// foldFile.faceOrders = solver2dLayers(foldFile);
+	// 	return !foldFile.file_frames
+	// 		? [ear.graph.flattenFrame(foldFile, 0)]
+	// 		: Array.from(Array(foldFile.file_frames.length + 1))
+	// 			.map((_, i) => ear.graph.flattenFrame(foldFile, i));
+	// };
 
 	const loadFOLD = (result) => {
 		FOLD = result;
@@ -97,11 +101,12 @@
 			? 0.1
 			: Math.log2((avgEdgeLen * 0.02) * 100000);
 		// find a decent spacing between layers (layerNudge)
-		const bounds = ear.graph.getBoundingBox(origami);
+		const bounds = ear.graph.boundingBox(origami);
 		if (bounds && bounds.span) {
 			const maxSpan = Math.max(...bounds.span);
-			// layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
-			layerNudgeSlider = Math.log2((maxSpan * 0.0005) * 100000);
+			// layerNudgeSlider = Math.log2((maxSpan * 0.002) * 100000);
+			layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
+			// layerNudgeSlider = Math.log2((maxSpan * 0.0005) * 100000);
 		}
 	};
 

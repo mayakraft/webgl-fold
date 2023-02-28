@@ -2,34 +2,20 @@
 	import Examples from "./Examples.svelte";
 	import FileContents from "./FileContents.svelte";
 	import StylePanel from "./StylePanel.svelte";
+	import {
+		FOLD,
+		selectedExample,
+		fileCanDownload,
+	} from "../stores/File.js";
 
-	export let origami = {};
-	export let frames = [];
-	export let selectedFrame = 0;
-	export let perspective = "orthographic";
-	export let viewClass = "creasePattern";
-	export let layerNudge = 1e-5;
-	export let opacity = 1.0;
-	export let fov = 30;
-	export let flipCameraZ = false;
-	export let frontColor = "#57f";
-	export let backColor = "#fff";
-	export let showFoldedCreases = false;
-	export let showFoldedFaces = true;
-	export let showFoldedFaceOutlines = true;
-	export let loadFOLD = () => {};
-
-	export let strokeWidthSlider;
-	export let layerNudgeSlider;
-
-	let selectedExample;
 	let showFileContents = true;
-	let showStyle = false;
+	let showStyle = true;
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
 		try {
-			loadFOLD(JSON.parse(string));
-			selectedExample = null;
+			$FOLD = JSON.parse(string);
+			$selectedExample = "placeholder";
+			$fileCanDownload = false;
 		}
 		catch (error) { window.alert(error); }
 	};
@@ -45,18 +31,28 @@
 			filename = files[0].name;
 			reader.readAsText(files[0]);
 		}
-	}
+	};
 
+	const downloadFOLD = () => {
+		const a = document.createElement("a");
+		a.style = "display: none";
+		document.body.appendChild(a);
+		const blob = new Blob([JSON.stringify($FOLD)], { type: "octet/stream" });
+		const url = window.URL.createObjectURL(blob);
+		a.href = url;
+		a.download = "origami.fold";
+		a.click();
+		window.URL.revokeObjectURL(url);
+	};
 </script>
 
 <div class="settings">
 	<h3>load FOLD</h3>
 	<input type="file" bind:files>
 
-	<!-- <hr /> -->
 	<br />
 
-	<Examples {loadFOLD} bind:selectedExample={selectedExample} />
+	<Examples />
 
 	<div
 		class="dropdown"
@@ -71,11 +67,13 @@
 	</div>
 
 	{#if showFileContents}
-		<FileContents
-			FOLD={origami}
-			{frames}
-			{selectedFrame}
-		/>
+		<FileContents />
+	{/if}
+
+	{#if $fileCanDownload}
+		<div class="download-button">
+			<button on:click={downloadFOLD}>download modified</button>
+		</div>
 	{/if}
 
 	<div
@@ -91,29 +89,16 @@
 	</div>
 
 	{#if showStyle}
-		<StylePanel
-			{origami}
-			{frames}
-			{selectedFrame}
-			{perspective}
-			{viewClass}
-			{layerNudge}
-			{opacity}
-			{fov}
-			{flipCameraZ}
-			{frontColor}
-			{backColor}
-			{showFoldedCreases}
-			{showFoldedFaces}
-			{showFoldedFaceOutlines}
-			{strokeWidthSlider}
-			{layerNudgeSlider}
-		/>
+		<StylePanel />
 	{/if}
 
 </div>
 
 <style>
+	.download-button {
+		margin: 0.2rem 0;
+		text-align: center;
+	}
 	.settings {
 		background-color: #0002;
 		z-index: 2;

@@ -1,102 +1,102 @@
 <script>
-	import ear from "rabbit-ear";
+	import count from "rabbit-ear/graph/count.js";
+	import { foldKeys } from "rabbit-ear/fold/keys.js";
+	import { isFoldObject } from "rabbit-ear/fold/spec.js";
 	import GeometryKey from "./GeometryKey.svelte";
-
-	export let FOLD = {};
-	export let frames = [];
-	export let selectedFrame = 0;
+	import {
+		FOLD,
+		frames,
+		frame,
+		frameIndex,
+	} from "../stores/File.js";
 
 	const findNonSpecKeys = (fold) => {
 		if (!fold) { return []; }
 		const map = {};
-		Object.values(ear.graph.foldKeys)
+		Object.values(foldKeys)
 			.forEach(arr => arr.forEach(key => { map[key] = true; }));
 		return Object.keys(fold).filter(key => !map[key]);
 	};
 
-	let frame = {};
-	$: frame = frames[selectedFrame];
 	let nonSpecKeys = [];
-	$: nonSpecKeys = findNonSpecKeys(frames[selectedFrame]);
-
-	let fileLoaded = false;
-	$: fileLoaded = ear.graph.isFoldObject(FOLD);
+	$: nonSpecKeys = findNonSpecKeys($frame);
 
 	let fileSize = 0;
-	$: fileSize = JSON.stringify(FOLD).length / 1000;
+	$: fileSize = JSON.stringify($FOLD).length / 1000;
 </script>
 
-{#if fileLoaded}
+{#if isFoldObject($FOLD)}
 <div>
 	<p><span class="value">{fileSize.toFixed(2)}</span> kb</p>
 
-	{#if frames.length > 1}
+	{#if $frames.length > 1}
 		<p>
-			frame: <span class="value">{selectedFrame+1}/{frames.length}</span>
+			frame: <span class="value">{$frameIndex+1}/{$frames.length}</span>
 		</p>
 		<div>
 			<input
 				type="range"
 				min=0
-				max={frames.length - 1}
+				max={$frames.length - 1}
 				step=1
-				bind:value={selectedFrame}/>
+				bind:value={$frameIndex}/>
 		</div>
+		<p>vertices: <span class="value">{count.vertices($FOLD)}</span>, edges: <span class="value">{count.edges($FOLD)}</span>, faces: <span class="value">{count.faces($FOLD)}</span></p>
 		<hr />
+	{:else}
+		<p>vertices: <span class="value">{count.vertices($FOLD)}</span>, edges: <span class="value">{count.edges($FOLD)}</span>, faces: <span class="value">{count.faces($FOLD)}</span></p>
 	{/if}
 
 
-	<p>vertices: <span class="value">{ear.graph.count.vertices(FOLD)}</span>, edges: <span class="value">{ear.graph.count.edges(FOLD)}</span>, faces: <span class="value">{ear.graph.count.faces(FOLD)}</span></p>
+	<!-- {#if $FOLD.file_spec}
+		<p>FOLD spec: <span class="value">{$FOLD.file_spec}</span></p>
+	{/if} -->
 
-	{#if FOLD.file_spec}
-		<p>FOLD spec: <span class="value">{FOLD.file_spec}</span></p>
+	{#if $FOLD.file_title}
+		<p>file title: <span class="value">{$FOLD.file_title}</span></p>
 	{/if}
 
-	{#if FOLD.file_title}
-		<p>file title: <span class="value">{FOLD.file_title}</span></p>
+	{#if $FOLD.file_author}
+		<p>file author: <span class="value">{$FOLD.file_author}</span></p>
 	{/if}
 
-	{#if FOLD.file_author}
-		<p>file author: <span class="value">{FOLD.file_author}</span></p>
+	{#if $FOLD.file_creator}
+		<p>file creator: <span class="value">{$FOLD.file_creator}</span></p>
 	{/if}
 
-	{#if FOLD.file_creator}
-		<p>file creator: <span class="value">{FOLD.file_creator}</span></p>
+	{#if $FOLD.file_description}
+		<p>file description: <span class="value">{$FOLD.file_description}</span></p>
 	{/if}
 
-	{#if FOLD.file_description}
-		<p>file description: <span class="value">{FOLD.file_description}</span></p>
-	{/if}
-
-	{#if FOLD.file_classes}
+	{#if $FOLD.file_classes}
 		<p>
 			file classes:
-			{#each FOLD.file_classes as str}
+			{#each $FOLD.file_classes as str}
 				<span class="pill">{str}</span>
 			{/each}
 		</p>
 	{/if}
 
-	{#if frame.frame_title}
-		<p>frame title: <span class="value">{frame.frame_title}</span></p>
+	{#if $frame.frame_title}
+		<p>frame title: <span class="value">{$frame.frame_title}</span></p>
 	{/if}
 
-	{#if frame.frame_author}
-		<p>frame author: <span class="value">{frame.frame_author}</span></p>
+	{#if $frame.frame_author}
+		<p>frame author: <span class="value">{$frame.frame_author}</span></p>
 	{/if}
 
-	{#if frame.frame_description}
-		<p>frame description: <span class="value">{frame.frame_description}</span></p>
+	{#if $frame.frame_description}
+		<p>frame description: <span class="value">{$frame.frame_description}</span></p>
 	{/if}
 
-	{#if frame.frame_unit}
-		<p>frame unit: <span class="value">{frame.frame_unit}</span></p>
+	{#if $frame.frame_unit}
+		<p>frame unit: <span class="value">{$frame.frame_unit}</span></p>
 	{/if}
 
-	{#if frame.frame_classes}
+	{#if $frame.frame_classes}
 		<p>
 			frame classes:
-			{#each frame.frame_classes as str}
+			{#each $frame.frame_classes as str}
 				<span class="pill">{str}</span>
 			{/each}
 		</p>
@@ -105,7 +105,7 @@
 	{#if frame.frame_attributes}
 		<p>
 			frame attributes:
-			{#each frame.frame_attributes as str}
+			{#each $frame.frame_attributes as str}
 				<span class="pill">{str}</span>
 			{/each}
 		</p>
@@ -122,18 +122,18 @@
 
 	<hr />
 
-	<GeometryKey bind:FOLD={FOLD} key={"vertices_coords"} />
-	<GeometryKey bind:FOLD={FOLD} key={"vertices_vertices"} />
-	<GeometryKey bind:FOLD={FOLD} key={"vertices_edges"} />
-	<GeometryKey bind:FOLD={FOLD} key={"vertices_faces"} />
-	<GeometryKey bind:FOLD={FOLD} key={"edges_vertices"} />
-	<GeometryKey bind:FOLD={FOLD} key={"edges_faces"} />
-	<GeometryKey bind:FOLD={FOLD} key={"edges_assignment"} />
-	<GeometryKey bind:FOLD={FOLD} key={"edges_foldAngle"} />
-	<GeometryKey bind:FOLD={FOLD} key={"faces_vertices"} />
-	<GeometryKey bind:FOLD={FOLD} key={"faces_edges"} />
-	<GeometryKey bind:FOLD={FOLD} key={"faces_faces"} />
-	<GeometryKey bind:FOLD={FOLD} key={"faceOrders"} />
+	<GeometryKey key={"vertices_coords"} />
+	<GeometryKey key={"vertices_vertices"} />
+	<GeometryKey key={"vertices_edges"} />
+	<GeometryKey key={"vertices_faces"} />
+	<GeometryKey key={"edges_vertices"} />
+	<GeometryKey key={"edges_faces"} />
+	<GeometryKey key={"edges_assignment"} />
+	<GeometryKey key={"edges_foldAngle"} />
+	<GeometryKey key={"faces_vertices"} />
+	<GeometryKey key={"faces_edges"} />
+	<GeometryKey key={"faces_faces"} />
+	<GeometryKey key={"faceOrders"} />
 </div>
 {/if}
 

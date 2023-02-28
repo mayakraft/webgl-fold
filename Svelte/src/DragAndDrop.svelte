@@ -1,7 +1,20 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
+	import {
+		FOLD,
+		selectedExample,
+		fileCanDownload,
+	} from "./stores/File.js";
 
-	export let loadFOLD = () => {};
+	const fileOnLoad = (event) => {
+		try {
+			$FOLD = JSON.parse(event.target.result);
+			$selectedExample = "placeholder";
+			$fileCanDownload = false;
+		} catch (error) {
+			window.alert(error);
+		}
+	};
 
 	const loadFiles = (event) => {
 		if (event.dataTransfer.items) {
@@ -14,14 +27,6 @@
 				reader.readAsText(transferFiles[0]);
 				return reader;
 			}
-		}
-	};
-
-	const fileOnLoad = (event) => {
-		try {
-			loadFOLD(JSON.parse(event.target.result));
-		} catch (error) {
-			window.alert(error);
 		}
 	};
 
@@ -43,15 +48,18 @@
 		document.body.addEventListener("dragover", dragover, false);
 		document.body.addEventListener("drop", drop, false);
 	});
+
 	onDestroy(() => {
 		document.body.removeEventListener("dragenter", dragenter, false);
 		document.body.removeEventListener("dragleave", dragleave, false);
 		document.body.removeEventListener("dragover", dragover, false);
 		document.body.removeEventListener("drop", drop, false);
-	})
+	});
 </script>
 
-<div class={isHovering ? "dragging" : ""} />
+	{#if isHovering}
+		<div class="dragging" />
+	{/if}
 
 <style>
 	div {

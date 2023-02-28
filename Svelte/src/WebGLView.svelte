@@ -1,24 +1,51 @@
 <script>
-	import ear from "rabbit-ear";
+	import {
+		identity4x4,
+		multiplyMatrices4,
+		invertMatrix4,
+		multiplyMatrix4Vector3,
+		makeMatrix4Scale,
+		makeMatrix4Translate,
+	} from "rabbit-ear/math/algebra/matrix4.js";
+	import { subtract } from "rabbit-ear/math/algebra/vector.js";
+	import {
+		quaternionFromTwoVectors,
+		matrix4FromQuaternion,
+	} from "rabbit-ear/math/algebra/quaternion.js";
+	import {
+		drawProgram,
+		deallocProgram,
+	} from "rabbit-ear/webgl/program.js";
+	import initialize from "rabbit-ear/webgl/general/initialize.js";
+	import {
+		rebuildViewport,
+		makeProjectionMatrix,
+		makeModelMatrix,
+	} from "rabbit-ear/webgl/general/view.js";
+	import creasePattern from "rabbit-ear/webgl/creasePattern/index.js";
+	import foldedForm from "rabbit-ear/webgl/foldedForm/index.js";
 	import { onMount, onDestroy } from "svelte";
 	import {
 		makeViewMatrixFront,
 		makeViewMatrixBack,
 	} from "../../src/general";
+	import {
+		perspective,
+		fov,
+		flipCameraZ,
+		viewClass,
+		strokeWidth,
+		opacity,
+		frontColor,
+		backColor,
+		showFoldedCreases,
+		showFoldedFaces,
+		showFoldedFaceOutlines,
+		layerNudge,
+	} from "./stores/View.js";
+	import { frame } from "./stores/File.js";
 
-	export let origami = {};
-	export let perspective = "orthographic";
-	export let viewClass = "creasePattern";
-	export let fov = 30;
-	export let strokeWidth = 0.0025;
-	export let layerNudge = 1e-5;
-	export let opacity = 1.0;
-	export let flipCameraZ = false;
-	export let frontColor = "#5580ff";
-	export let backColor = "#fff";
-	export let showFoldedCreases = false;
-	export let showFoldedFaces = true;
-	export let showFoldedFaceOutlines = true;
+	const WebGLProgram = { creasePattern, foldedForm };
 
 	const dragSpeed = 3.0;
 	// Svelte will bind these. canvas to <canvas>
@@ -30,9 +57,9 @@
 	// let animationID;
 	let programs = [];
 	// gl matrices
-	let projectionMatrix = ear.math.identity4x4;
-	let viewMatrix = ear.math.identity4x4;
-	let modelMatrix = ear.math.identity4x4;
+	let projectionMatrix = identity4x4;
+	let viewMatrix = identity4x4;
+	let modelMatrix = identity4x4;
 	// touch interaction
 	let pressVector; // this is the location of the onPress. used in onMove.
 	let pressViewMatrix; // onPress. used in onMove.
@@ -43,55 +70,57 @@
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		const uniforms = programs.map(prog => prog.makeUniforms(gl, {
-			projectionMatrix, viewMatrix, modelMatrix,
-			strokeWidth, opacity, touchPoint, canvas, frontColor, backColor,
-			projectedTouch,
+			projectionMatrix, viewMatrix, modelMatrix, touchPoint, canvas, projectedTouch,
+			strokeWidth: $strokeWidth,
+			opacity: $opacity,
+			frontColor: $frontColor,
+			backColor: $backColor,
 		}));
-		programs.forEach((program, i) => ear.webgl.drawProgram(gl, version, program, uniforms[i]));
+		programs.forEach((program, i) => drawProgram(gl, version, program, uniforms[i]));
 	};
 
 	const rebuildShaders = (graph) => {
 		if (!gl) { return; }
 		deallocPrograms();
 		const options = {
-			layerNudge,
-			outlines: showFoldedFaceOutlines,
-			edges: showFoldedCreases,
-			faces: showFoldedFaces,
+			layerNudge: $layerNudge,
+			outlines: $showFoldedFaceOutlines,
+			edges: $showFoldedCreases,
+			faces: $showFoldedFaces,
 		};
-		programs = [...ear.webgl[viewClass](gl, version, graph, options)];
+		programs = [...WebGLProgram[$viewClass](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));
 	};
 
 	const deallocPrograms = () => {
-		programs.forEach(program => ear.webgl.deallocProgram(gl, program));
+		programs.forEach(program => deallocProgram(gl, program));
 		while (programs.length) { programs.pop(); }
 	};
 
 	const rebuildAllAndDraw = () => {
-		ear.webgl.rebuildViewport(gl, canvas);
-		rebuildShaders(origami);
-		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, perspective, fov);
-		viewMatrix = flipCameraZ ? makeViewMatrixBack() : makeViewMatrixFront();
-		modelMatrix = ear.webgl.makeModelMatrix(origami);
+		rebuildViewport(gl, canvas);
+		rebuildShaders($frame);
+		projectionMatrix = makeProjectionMatrix(canvas, $perspective, $fov);
+		viewMatrix = $flipCameraZ ? makeViewMatrixBack() : makeViewMatrixFront();
+		modelMatrix = makeModelMatrix($frame);
 		draw();
 	};
 
 	const rebuildModelAndDraw = () => {
-		rebuildShaders(origami);
+		rebuildShaders($frame);
 		draw();
 	};
 
 	const rebuildProjectionAndDraw = () => {
-		ear.webgl.rebuildViewport(gl, canvas);
-		projectionMatrix = ear.webgl.makeProjectionMatrix(canvas, perspective, fov);
+		rebuildViewport(gl, canvas);
+		projectionMatrix = makeProjectionMatrix(canvas, $perspective, $fov);
 		draw();
 	};
 
-	$: rebuildModelAndDraw(layerNudge, showFoldedCreases, showFoldedFaces, showFoldedFaceOutlines);
-	$: rebuildProjectionAndDraw(innerWidth, innerHeight, fov);
-	$: rebuildAllAndDraw(origami, viewClass, perspective, flipCameraZ);
-	$: draw(strokeWidth, opacity, frontColor, backColor);
+	$: rebuildModelAndDraw($layerNudge, $showFoldedCreases, $showFoldedFaces, $showFoldedFaceOutlines);
+	$: rebuildProjectionAndDraw(innerWidth, innerHeight, $fov);
+	$: rebuildAllAndDraw($frame, $viewClass, $perspective, $flipCameraZ);
+	$: draw($strokeWidth, $opacity, $frontColor, $backColor);
 
 	onMount(() => {
 		canvas.addEventListener("mousedown", onPress, false);
@@ -102,9 +131,9 @@
 		canvas.addEventListener("ontouchmove", onMove, false);
 		canvas.addEventListener("ontouchend", onRelease, false);
 		// force a particular WebGL version
-		// const init = ear.webgl.initialize(canvas, 1); // WebGL version 1
-		// const init = ear.webgl.initialize(canvas, 2); // WebGL version 2
-		const init = ear.webgl.initialize(canvas);
+		// const init = initialize(canvas, 1); // WebGL version 1
+		// const init = initialize(canvas, 2); // WebGL version 2
+		const init = initialize(canvas);
 		gl = init.gl;
 		version = init.version;
 		if (!gl) {
@@ -137,8 +166,8 @@
 	 * matrix A, matrix B
 	 */
 	const vectorFromScreenLocation = (point, canvasSize, M = viewMatrix, scale = 1) => {
-		const matrix = ear.math.multiplyMatrices4(projectionMatrix, M);
-		const inverse = ear.math.invertMatrix4(matrix);
+		const matrix = multiplyMatrices4(projectionMatrix, M);
+		const inverse = invertMatrix4(matrix);
 		const scaled = [0, 1].map(i => point[i] / canvasSize[i]);
 		const centerScreen = [-2,0,0,0,0,2,0,0,0,0,1,0,1,-1,0,1];
 		// const screen = [
@@ -146,12 +175,12 @@
 		// 	2.0 * (scaled[1] - 0.5),
 		// 	1.0
 		// ];
-		// const screen = ear.math.multiplyMatrix4Vector3(centerScreen, [...scaled, 1]);
-		const screen = ear.math.multiplyMatrix4Vector3(
-			ear.math.makeMatrix4Scale([scale, scale, 1]),
-			ear.math.multiplyMatrix4Vector3(centerScreen, [...scaled, 1]),
+		// const screen = multiplyMatrix4Vector3(centerScreen, [...scaled, 1]);
+		const screen = multiplyMatrix4Vector3(
+			makeMatrix4Scale([scale, scale, 1]),
+			multiplyMatrix4Vector3(centerScreen, [...scaled, 1]),
 		);
-		const res = ear.math.multiplyMatrix4Vector3(inverse, screen);
+		const res = multiplyMatrix4Vector3(inverse, screen);
 		return res;
 	};
 
@@ -162,7 +191,7 @@
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
 			pressViewMatrix,
-			perspective === "perspective" ? dragSpeed : 1,
+			$perspective === "perspective" ? dragSpeed : 1,
 		);
 	};
 
@@ -183,19 +212,19 @@
 			[e.offsetX, e.offsetY],
 			[canvas.clientWidth, canvas.clientHeight],
 			pressViewMatrix,
-			perspective === "perspective" ? dragSpeed : 1,
+			$perspective === "perspective" ? dragSpeed : 1,
 		);
-		switch (perspective) {
+		switch ($perspective) {
 			case "perspective": {
-				const quaternion = ear.math.quaternionFromTwoVectors(pressVector, nowVector);
-				const matrix = ear.math.matrix4FromQuaternion(quaternion);
-				viewMatrix = ear.math.multiplyMatrices4(pressViewMatrix, matrix);
+				const quaternion = quaternionFromTwoVectors(pressVector, nowVector);
+				const matrix = matrix4FromQuaternion(quaternion);
+				viewMatrix = multiplyMatrices4(pressViewMatrix, matrix);
 			} break;
 			case "orthographic": {
-				const vector = ear.math.subtract(nowVector, pressVector);
-				const translate = ear.math.makeMatrix4Translate(...vector);
-				const matrix = ear.math.invertMatrix4(translate);
-				viewMatrix = ear.math.multiplyMatrices4(pressViewMatrix, matrix);
+				const vector = subtract(nowVector, pressVector);
+				const translate = makeMatrix4Translate(...vector);
+				const matrix = invertMatrix4(translate);
+				viewMatrix = multiplyMatrices4(pressViewMatrix, matrix);
 			} break;
 		}
 		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
@@ -213,15 +242,15 @@
 		const scrollSensitivity = 1 / 100;
 		const delta = -e.deltaY * scrollSensitivity;
 		if (Math.abs(delta) < 1e-3) { return false; }
-		switch (perspective) {
+		switch ($perspective) {
 			case "perspective": {
-				const translateMatrix = ear.math.makeMatrix4Translate(0, 0, delta);
-				viewMatrix = ear.math.multiplyMatrices4(translateMatrix, viewMatrix);
+				const translateMatrix = makeMatrix4Translate(0, 0, delta);
+				viewMatrix = multiplyMatrices4(translateMatrix, viewMatrix);
 			} break;
 			case "orthographic": {
 				const scale = 1 + delta;
-				const scaleMatrix = ear.math.makeMatrix4Scale([scale, scale, scale]);
-				viewMatrix = ear.math.multiplyMatrices4(scaleMatrix, viewMatrix);
+				const scaleMatrix = makeMatrix4Scale([scale, scale, scale]);
+				viewMatrix = multiplyMatrices4(scaleMatrix, viewMatrix);
 			} break;
 		}
 		touchPoint = [e.offsetX, e.offsetY].map(n => n * devicePixelRatio);
@@ -246,9 +275,15 @@
 	bind:innerHeight
 />
 
-<canvas bind:this="{canvas}"></canvas>
+<div>
+	<canvas bind:this="{canvas}"></canvas>
+</div>
 
 <style>
+	div {
+		height: 100%;
+		overflow-y: hidden;
+	}
 	canvas {
 		width: 100%;
 		height: 100%;

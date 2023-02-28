@@ -1,34 +1,62 @@
 <script>
-	export let origami = {};
-	export let frames = [];
-	export let selectedFrame = 0;
-	export let perspective = "orthographic";
-	export let viewClass = "creasePattern";
-	export let layerNudge = 1e-5;
-	export let opacity = 1.0;
-	export let fov = 30;
-	export let flipCameraZ = false;
-	export let frontColor = "#57f";
-	export let backColor = "#fff";
-	export let showFoldedCreases = false;
-	export let showFoldedFaces = true;
-	export let showFoldedFaceOutlines = true;
-	export let strokeWidthSlider;
-	export let layerNudgeSlider;
+	import {
+		FOLD,
+		frame,
+	} from "../stores/File.js";
+	import {
+		perspective,
+		fov,
+		flipCameraZ,
+		viewClass,
+		strokeWidth,
+		opacity,
+		frontColor,
+		backColor,
+		showFoldedCreases,
+		showFoldedFaces,
+		showFoldedFaceOutlines,
+		layerNudge,
+	} from "../stores/View.js";
+	import { averageEdgeLength } from "../../../src/general";
+	import { boundingBox } from "rabbit-ear/graph/boundary.js";
+
+	let strokeWidthSlider = 5;
+	$: $strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+
+	let layerNudgeSlider = 6;
+	$: $layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+
+	const updateSliders = (graph) => {
+		const avgEdgeLen = averageEdgeLength(graph);
+		// invert this: Math.pow(2, strokeWidthSlider) / 100000;
+		strokeWidthSlider = !avgEdgeLen
+			? 0.1
+			: Math.log2((avgEdgeLen * 0.02) * 100000);
+		$strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+		// find a decent spacing between layers (layerNudge)
+		const bounds = boundingBox(graph);
+		if (bounds && bounds.span) {
+			const maxSpan = Math.max(...bounds.span);
+			layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
+			$layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+		}
+	};
+
+	$: updateSliders($frame);
 </script>
 
 	<h3>viewport</h3>
 	<!-- perspective (orthographic/perspective) -->
 	<input
 		type="radio"
-		bind:group={perspective}
+		bind:group={$perspective}
 		name="radio-webgl-perspective"
 		id="radio-webgl-perspective-orthographic"
 		value="orthographic">
 	<label for="radio-webgl-perspective-orthographic">orthographic</label>
 	<input
 		type="radio"
-		bind:group={perspective}
+		bind:group={$perspective}
 		name="radio-webgl-perspective"
 		id="radio-webgl-perspective-perspective"
 		value="perspective">
@@ -37,12 +65,12 @@
 	<!-- field of view -->
 	{#if perspective === "perspective"}
 		<span>field of view:</span>
-		<input type="text" placeholder="field of view" bind:value={fov}>
+		<input type="text" placeholder="field of view" bind:value={$fov}>
 		<br/>
 	{/if}
 	<!-- flip model over -->
 	<span>flip over</span>
-	<input type="checkbox" bind:checked={flipCameraZ} />
+	<input type="checkbox" bind:checked={$flipCameraZ} />
 
 	<hr />
 
@@ -52,19 +80,19 @@
 		type="radio"
 		name="radio-view-class"
 		id="radio-view-class-cp"
-		bind:group={viewClass}
+		bind:group={$viewClass}
 		value="creasePattern">
 	<label for="radio-view-class-cp">crease pattern</label>
 	<input
 		type="radio"
 		name="radio-view-class"
 		id="radio-view-class-folded"
-		bind:group={viewClass}
+		bind:group={$viewClass}
 		value="foldedForm">
 	<label for="radio-view-class-folded">folded form</label>
 	<br />
 	<!-- stroke width -->
-	{#if viewClass === "creasePattern"}
+	{#if $viewClass === "creasePattern"}
 		<span>stroke width</span><input
 			type="range"
 			min="1"
@@ -73,35 +101,35 @@
 			bind:value={strokeWidthSlider} />
 	{/if}
 	<!-- folded form face style -->
-	{#if viewClass === "foldedForm"}
+	{#if $viewClass === "foldedForm"}
 		<span>opacity</span><input
 			type="range"
 			min="0"
 			max="1"
 			step="0.01"
-			bind:value={opacity} />
+			bind:value={$opacity} />
 		<br />
-		<span>front</span><input type="text" bind:value={frontColor} />
-		<span>back</span><input type="text" bind:value={backColor} />
+		<span>front</span><input type="text" bind:value={$frontColor} />
+		<span>back</span><input type="text" bind:value={$backColor} />
 	{/if}
 	<!-- folded form edge style -->
-	{#if viewClass === "foldedForm"}
+	{#if $viewClass === "foldedForm"}
 		<br/>
 		<span>show faces</span>
 		<input
 			type="checkbox"
-			bind:checked={showFoldedFaces} />
+			bind:checked={$showFoldedFaces} />
 		<br/>
 		<span>face outlines</span>
 		<input
 			type="checkbox"
-			bind:checked={showFoldedFaceOutlines}
-			disabled={!showFoldedFaces} />
+			bind:checked={$showFoldedFaceOutlines}
+			disabled={!$showFoldedFaces} />
 		<br/>
 		<span>show creases</span>
 		<input
 			type="checkbox"
-			bind:checked={showFoldedCreases} />
+			bind:checked={$showFoldedCreases} />
 		<br/>
 		<span>stroke width</span><input
 			type="range"
@@ -109,12 +137,12 @@
 			max="20"
 			step="0.01"
 			bind:value={strokeWidthSlider}
-			disabled={!showFoldedCreases} />
+			disabled={!$showFoldedCreases} />
 		<br/>
 	{/if}
 	<!-- nudge layers for origami with layer orders -->
-	{#if viewClass === "foldedForm" && origami !== undefined}
-		{#if origami.faceOrders || origami.faces_layer}
+	{#if $viewClass === "foldedForm" && $FOLD !== undefined}
+		{#if $FOLD.faceOrders || $FOLD.faces_layer}
 			<hr />
 			<h3>overlapping faces</h3>
 			<span>explode layers</span><input
@@ -124,7 +152,7 @@
 				step="0.01"
 				bind:value={layerNudgeSlider} />
 			<br />
-			<input type="text" class="long-input" bind:value={layerNudge} />
+			<input type="text" class="long-input" bind:value={$layerNudge} />
 		{/if}
 	{/if}
 

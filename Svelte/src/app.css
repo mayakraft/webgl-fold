@@ -31,17 +31,21 @@ body {
 p { margin: 0 }
 
 button {
+  color: #49f;
   border-radius: 3px;
   border: 1px solid transparent;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: transparent;
   cursor: pointer;
+  margin: 0;
+  padding: 0.1rem 0.2rem;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #49f;
+  transition: border-color 0s;
 }
 button:focus,
 button:focus-visible {

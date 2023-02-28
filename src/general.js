@@ -1,4 +1,5 @@
-import ear from "rabbit-ear";
+// import ear from "rabbit-ear";
+import { distance } from "rabbit-ear/math/algebra/vector.js";
 
 export const makeViewMatrixFront = () => [
 	1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1.85, 1,
@@ -15,12 +16,13 @@ export const makeViewMatrixBack = () => [
 	-1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, -1.85, 1,
 ];
 
-// const makeViewMatrix = () => ear.math.invertMatrix4(ear.math.makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, 1, 1]));
+// const makeViewMatrix = () => invertMatrix4(makeLookAtMatrix4([0, 0, 1], [0, 0, 0], [0, 1, 1]));
 
 const edgeLength = (graph, index) => {
 	const vertices = graph.edges_vertices[index]
 		.map(vert => graph.vertices_coords[vert]);
-	return ear.math.distance(...vertices);
+	// return ear.math.distance(...vertices);
+	return distance(...vertices);
 };
 /**
  * @returns the average of (no more than) 100 edge lengths,

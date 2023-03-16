@@ -28,7 +28,7 @@
 	import {
 		makeViewMatrixFront,
 		makeViewMatrixBack,
-	} from "../../src/general";
+	} from "../../shared/view.js";
 	import {
 		perspective,
 		fov,
@@ -87,6 +87,20 @@
 			outlines: $showFoldedFaceOutlines,
 			edges: $showFoldedCreases,
 			faces: $showFoldedFaces,
+			B: [0.3, 0.3, 0.3],
+			b: [0.3, 0.3, 0.3],
+			V: [0.2, 0.4, 0.6],
+			v: [0.2, 0.4, 0.6],
+			M: [0.75, 0.25, 0.15],
+			m: [0.75, 0.25, 0.15],
+			F: [0.4, 0.4, 0.4],
+			f: [0.4, 0.4, 0.4],
+			J: [0.2, 0.2, 0.2],
+			j: [0.2, 0.2, 0.2],
+			C: [1.0, 0.75, 0.25],
+			c: [1.0, 0.75, 0.25],
+			U: [0.6, 0.25, 0.9],
+			u: [0.6, 0.25, 0.9],
 		};
 		programs = [...WebGLProgram[$viewClass](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));

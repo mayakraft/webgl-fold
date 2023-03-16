@@ -11,7 +11,9 @@
 		strokeWidth,
 		layerNudge,
 	} from "./stores/View.js";
-	import { flattenFrame } from "rabbit-ear/graph/fileFrames.js";
+	import { flattenFrame } from "rabbit-ear/fold/fileFrames.js";
+	import { averageEdgeLength } from "../../shared/graph.js";
+	import { boundingBox } from "rabbit-ear/graph/boundary.js";
 
 	const updateViewSettings = (graph) => {
 		if (graph && graph.frame_classes) {
@@ -25,11 +27,26 @@
 		}
 	};
 
+	const updateSliders = (graph) => {
+		const avgEdgeLen = averageEdgeLength(graph);
+		// invert this: Math.pow(2, strokeWidthSlider) / 100000;
+		const strokeWidthSlider = !avgEdgeLen
+			? 0.1
+			: Math.log2((avgEdgeLen * 0.02) * 100000);
+		$strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+		// find a decent spacing between layers (layerNudge)
+		const bounds = boundingBox(graph);
+		if (bounds && bounds.span) {
+			const maxSpan = Math.max(...bounds.span);
+			const layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
+			$layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+		}
+	};
+
 	const getFileFrames = (foldFile) => !foldFile.file_frames
 		? [flattenFrame(foldFile, 0)]
 		: Array.from(Array(foldFile.file_frames.length + 1))
 			.map((_, i) => flattenFrame(foldFile, i));
-
 
 	const solver3dLayers = (graph) => {
 		if (!graph || !graph.vertices_coords || !graph.faces_vertices) { return; }
@@ -70,15 +87,20 @@
 	// 			.map((_, i) => flattenFrame(foldFile, i));
 	// };
 
+	// this is the only place in the app that sets "frames"
 	$: {
-		$frameIndex = 0;
 		$frames = getFileFrames($FOLD);
-		$frame = $frames[0];
+		// $frame = $frames[0];
+		if ($frameIndex >= $frames.length) {
+			$frameIndex = $frames.length - 1;
+		}
 	}
 
+	// when "frameIndex" changes
 	$: {
-		$frame = $frames[$frameIndex];
+		$frame = $frames[$frameIndex] || {};
 		updateViewSettings($frame);
+		updateSliders($frame);
 	}
 
 </script>

@@ -9,6 +9,7 @@
 	import kabuto from "../../../fold/kabuto.fold?raw";
 	import {
 		FOLD,
+		frameIndex,
 		selectedExample,
 		fileCanDownload,
 	} from "../stores/File.js";
@@ -25,6 +26,7 @@
 
 	$: if ($selectedExample != null && $selectedExample !== "placeholder") {
 		$FOLD = JSON.parse(examples[$selectedExample].data);
+		$frameIndex = 0;
 		$fileCanDownload = false;
 	}
 

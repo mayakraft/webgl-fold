@@ -4,6 +4,7 @@
 	import StylePanel from "./StylePanel.svelte";
 	import {
 		FOLD,
+		frameIndex,
 		selectedExample,
 		fileCanDownload,
 	} from "../stores/File.js";
@@ -14,6 +15,7 @@
 	const fileDialogDidLoad = (string, filename, mimeType) => {
 		try {
 			$FOLD = JSON.parse(string);
+			$frameIndex = 0;
 			$selectedExample = "placeholder";
 			$fileCanDownload = false;
 		}
@@ -32,53 +34,37 @@
 			reader.readAsText(files[0]);
 		}
 	};
-
-	const downloadFOLD = () => {
-		const a = document.createElement("a");
-		a.style = "display: none";
-		document.body.appendChild(a);
-		const blob = new Blob([JSON.stringify($FOLD)], { type: "octet/stream" });
-		const url = window.URL.createObjectURL(blob);
-		a.href = url;
-		a.download = "origami.fold";
-		a.click();
-		window.URL.revokeObjectURL(url);
-	};
 </script>
 
 <div class="settings">
-	<h3>load FOLD</h3>
+	<h3>FOLD</h3>
 	<input type="file" bind:files>
 
 	<br />
 
 	<Examples />
 
-	<div
+	<button
 		class="dropdown"
-		on:click={() => showFileContents = !showFileContents}>
-		<h3>file contents</h3>
+		on:click={() => showFileContents = !showFileContents}
+		>
+		<h3>file</h3>
 		{#if showFileContents}
 			<span class="triangle">▼</span>
 		{/if}
 		{#if !showFileContents}
 			<span class="triangle rotated">▼</span>
 		{/if}
-	</div>
+	</button>
 
 	{#if showFileContents}
 		<FileContents />
 	{/if}
 
-	{#if $fileCanDownload}
-		<div class="download-button">
-			<button on:click={downloadFOLD}>download modified</button>
-		</div>
-	{/if}
-
-	<div
+	<button
 		class="dropdown"
-		on:click={() => showStyle = !showStyle}>
+		on:click={() => showStyle = !showStyle}
+		>
 		<h3>style</h3>
 		{#if showStyle}
 			<span class="triangle">▼</span>
@@ -86,7 +72,7 @@
 		{#if !showStyle}
 			<span class="triangle rotated">▼</span>
 		{/if}
-	</div>
+	</button>
 
 	{#if showStyle}
 		<StylePanel />
@@ -95,10 +81,6 @@
 </div>
 
 <style>
-	.download-button {
-		margin: 0.2rem 0;
-		text-align: center;
-	}
 	.settings {
 		background-color: #0002;
 		z-index: 2;
@@ -113,15 +95,28 @@
 		margin: 0;
 		padding: 0;
 	}
+	button {
+		all: unset;
+		display: inline-block;
+		width: 100%;
+		border-top: 2px solid transparent;
+		border-bottom: 2px solid transparent;
+		outline: 1px solid transparent;
+	}
+	button:focus,
+	button:focus-visible {
+		border-top: 2px solid #38f;
+		border-bottom: 2px solid #38f;
+		outline: 1px solid #666;
+	}
 	.dropdown {
 		text-transform: uppercase;
 		letter-spacing: 0.15rem;
 		background-color: #4444;
 		margin: 0.25rem -0.5rem;
 		padding: 0rem 0.5rem;
-		border: 0 solid #666;
-		border-top-width: 1px;
-		border-bottom-width: 1px;
+		border-top: 2px solid #666;
+		border-bottom: 2px solid #666;
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
@@ -132,15 +127,6 @@
 	}
 	.dropdown h3 {
 		font-size: 1rem;
-	}
-	input[type=text] {
-		width: 4rem;
-	}
-	input[type=text].long-input {
-		width: 8rem;
-	}
-	span + input[type=text] {
-		margin-left: 0.5rem;
 	}
 	span.rotated {
 		transform: rotate(90deg);

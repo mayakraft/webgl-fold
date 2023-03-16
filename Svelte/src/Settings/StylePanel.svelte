@@ -17,7 +17,7 @@
 		showFoldedFaceOutlines,
 		layerNudge,
 	} from "../stores/View.js";
-	import { averageEdgeLength } from "../../../src/general";
+	import { averageEdgeLength } from "../../../shared/graph.js";
 	import { boundingBox } from "rabbit-ear/graph/boundary.js";
 
 	let strokeWidthSlider = 5;

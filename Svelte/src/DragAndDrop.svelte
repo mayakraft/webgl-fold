@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from "svelte";
 	import {
 		FOLD,
+		frameIndex,
 		selectedExample,
 		fileCanDownload,
 	} from "./stores/File.js";
@@ -9,6 +10,7 @@
 	const fileOnLoad = (event) => {
 		try {
 			$FOLD = JSON.parse(event.target.result);
+			$frameIndex = 0;
 			$selectedExample = "placeholder";
 			$fileCanDownload = false;
 		} catch (error) {

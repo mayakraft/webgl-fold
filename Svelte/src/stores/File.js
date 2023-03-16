@@ -23,10 +23,30 @@ export const fileCanDownload = writable(false);
 // will want to reset this when the user loads a local file.
 export const selectedExample = writable("placeholder");
 
+/**
+ * "soft" modify a FOLD file. the same file is loaded but it's
+ * slightly modified, so we still want to trigger a refresh on
+ * all components, but we don't want the frameIndex to change
+ */
 export const modifyFrame = (object) => {
-	console.log("todo: should we modify the FOLD root, or the current frame?");
-	FOLD.set({...get(FOLD), ...object });
+	if (!object) { return; }
+	const cachedIndex = get(frameIndex);
+	switch (get(frameIndex)) {
+	case 0:
+		FOLD.set({...get(FOLD), ...object });
+		break;
+	default:
+		const fold = get(FOLD);
+		fold.file_frames[get(frameIndex) - 1] = {
+			...fold.file_frames[get(frameIndex) - 1],
+			...object,
+		};
+		FOLD.set({ ...fold });
+		break;
+	}
 	fileCanDownload.set(true);
+	console.log("setting cachedIndex", cachedIndex);
+	frameIndex.set(cachedIndex);
 };
 
 

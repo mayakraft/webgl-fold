@@ -1,12 +1,9 @@
 <script>
-	import File from "./File.svelte";
-	import DragAndDrop from "./DragAndDrop.svelte";
+	import FileManager from "./FileManager/FileManager.svelte";
 	import Settings from "./Settings/Settings.svelte";
 	import WebGLView from "./WebGLView.svelte";
 </script>
 
-<File />
-<DragAndDrop />
-
+<FileManager />
 <Settings />
 <WebGLView />

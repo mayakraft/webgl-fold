@@ -28,7 +28,6 @@
 
 	// file keys, besides file_classes and file_frames and file_spec
 	const fileKeys = [
-		// "file_spec",
 		"file_title",
 		"file_author",
 		"file_creator",
@@ -145,7 +144,7 @@
 	{#if $fileCanDownload}
 		<hr />
 		<div class="download-button">
-			<button on:click={downloadFOLD}>download modified file</button>
+			<button on:click={downloadFOLD}>download file</button>
 		</div>
 	{/if}
 

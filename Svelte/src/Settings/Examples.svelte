@@ -8,10 +8,8 @@
 	import blintzFrames from "../../../fold/blintz-frames.fold?raw";
 	import kabuto from "../../../fold/kabuto.fold?raw";
 	import {
-		FOLD,
-		frameIndex,
+		tryLoadFile,
 		selectedExample,
-		fileCanDownload,
 	} from "../stores/File.js";
 
 	const examples = {
@@ -25,9 +23,7 @@
 	};
 
 	$: if ($selectedExample != null && $selectedExample !== "placeholder") {
-		$FOLD = JSON.parse(examples[$selectedExample].data);
-		$frameIndex = 0;
-		$fileCanDownload = false;
+		tryLoadFile(examples[$selectedExample].data, `${selectedExample}.fold`);
 	}
 
 	// load example on start

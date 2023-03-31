@@ -69,6 +69,7 @@
 	const draw = () => {
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		// console.log("projectionMatrix, viewMatrix, modelMatrix", projectionMatrix, viewMatrix, modelMatrix);
 		const uniforms = programs.map(prog => prog.makeUniforms(gl, {
 			projectionMatrix, viewMatrix, modelMatrix, touchPoint, canvas, projectedTouch,
 			strokeWidth: $strokeWidth,
@@ -87,18 +88,18 @@
 			outlines: $showFoldedFaceOutlines,
 			edges: $showFoldedCreases,
 			faces: $showFoldedFaces,
-			B: [0.3, 0.3, 0.3],
-			b: [0.3, 0.3, 0.3],
+			B: [0.5, 0.5, 0.5],
+			b: [0.5, 0.5, 0.5],
 			V: [0.2, 0.4, 0.6],
 			v: [0.2, 0.4, 0.6],
 			M: [0.75, 0.25, 0.15],
 			m: [0.75, 0.25, 0.15],
-			F: [0.4, 0.4, 0.4],
-			f: [0.4, 0.4, 0.4],
-			J: [0.2, 0.2, 0.2],
-			j: [0.2, 0.2, 0.2],
-			C: [1.0, 0.75, 0.25],
-			c: [1.0, 0.75, 0.25],
+			F: [0.3, 0.3, 0.3],
+			f: [0.3, 0.3, 0.3],
+			J: [0.3, 0.2, 0.0],
+			j: [0.3, 0.2, 0.0],
+			C: [0.5, 0.8, 0.1],
+			c: [0.5, 0.8, 0.1],
 			U: [0.6, 0.25, 0.9],
 			u: [0.6, 0.25, 0.9],
 		};

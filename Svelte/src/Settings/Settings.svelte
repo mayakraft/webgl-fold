@@ -3,23 +3,16 @@
 	import FileContents from "./FileContents.svelte";
 	import StylePanel from "./StylePanel.svelte";
 	import {
-		FOLD,
-		frameIndex,
+		tryLoadFile,
 		selectedExample,
-		fileCanDownload,
 	} from "../stores/File.js";
 
 	let showFileContents = true;
-	let showStyle = true;
+	let showStyle = false;
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
-		try {
-			$FOLD = JSON.parse(string);
-			$frameIndex = 0;
-			$selectedExample = "placeholder";
-			$fileCanDownload = false;
-		}
-		catch (error) { window.alert(error); }
+		tryLoadFile(string, filename, {});
+		$selectedExample = "placeholder";
 	};
 
 	let files;

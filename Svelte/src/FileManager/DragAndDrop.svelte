@@ -1,32 +1,39 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
 	import {
-		FOLD,
-		frameIndex,
 		selectedExample,
-		fileCanDownload,
-	} from "./stores/File.js";
-
-	const fileOnLoad = (event) => {
-		try {
-			$FOLD = JSON.parse(event.target.result);
-			$frameIndex = 0;
-			$selectedExample = "placeholder";
-			$fileCanDownload = false;
-		} catch (error) {
-			window.alert(error);
-		}
-	};
+		tryLoadFile,
+	} from "../stores/File.js";
 
 	const loadFiles = (event) => {
+		// drag and drop file event is weird.
+		// have to cache the filename here
+		// because it's not contained in the event object
+		// that gets passed into the async function fileOnLoad
+		let filename = "";
+
+		const fileOnLoad = (event) => {
+			try {
+				tryLoadFile(event.target.result, filename, {});
+				$selectedExample = "placeholder";
+			} catch (error) {
+				window.alert(error);
+			}
+		};
+
 		if (event.dataTransfer.items) {
-			const transferFiles = [...event.dataTransfer.items]
-				.filter(el => el.kind === "file")
-				.map(el => el.getAsFile());
-			if (transferFiles.length) {
+			const filenames = [...event.dataTransfer.files]
+				.map(el => el.name);
+			const transferFile = [...event.dataTransfer.items]
+				.map((item, i) => ({ item, filename: filenames[i] }))
+				.filter(el => el.item.kind === "file")
+				.map(el => ({ ...el, contents: el.item.getAsFile() }))
+				.shift();
+			if (transferFile) {
 				const reader = new FileReader();
 				reader.onload = fileOnLoad;
-				reader.readAsText(transferFiles[0]);
+				filename = transferFile.filename;
+				reader.readAsText(transferFile.contents);
 				return reader;
 			}
 		}

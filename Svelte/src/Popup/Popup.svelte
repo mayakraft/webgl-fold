@@ -1,5 +1,5 @@
 <script>
-	let pageIndex = 0;
+	export let pageIndex = 0;
 	export let pageNames = [];
 
 </script>
@@ -13,8 +13,8 @@
 				<slot name="canvas" />
 			</div>
 		</div>
+		<hr />
 		<div class="body">
-			<!-- <slot name={`page-${pageIndex}`} /> -->
 			{#if pageIndex === 0}
 				<slot name="page-0" />
 			{/if}
@@ -40,22 +40,39 @@
 </div>
 
 <style>
+	:global(body) .background { background-color: #fffa; }
+	:global(body.dark) .background { background-color: #0006; }
+	:global(body) .popup {
+		background-color: #fff;
+		box-shadow: 0 0 1rem #666;
+	}
+	:global(body.dark) .popup {
+		background-color: #222;
+		box-shadow: 0 0 1rem black;
+	}
+	:global(body) .title-bar { background-color: #ddd; }
+	:global(body.dark) .title-bar { background-color: #333; }
+	:global(body) .tab-bar > * { background-color: #ddd; }
+	:global(body.dark) .tab-bar > * { background-color: #333; }
+	:global(body) button { color: black; }
+	:global(body.dark) button { color: #39f; }
+	:global(body) button:hover { color: #39f; }
+	:global(body.dark) button:hover { color: white; }
+	:global(body) hr { background-color: #ddd; }
+	:global(body.dark) hr { background-color: #666; }
+
 	button {
-		font-weight: bold;
 		border: none;
-		border-color: #49f;
-	  transition: color 0.25s, border-color 0.25s;
+		font-weight: bold;
+	  transition: color 0.25s;
 	}
 	button:hover {
-		color: #fff;
-		border-color: #fff;
 		transition: border-color 0s;
 	}
 	button:focus,
 	button:focus-visible {
 		outline: 4px auto -webkit-focus-ring-color;
 	}
-
 	.background {
 		position: absolute;
 		top: 0;
@@ -64,7 +81,6 @@
 		width: 100vw;
 		height: 100vh;
 		overflow: hidden;
-		background-color: #0006;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -77,13 +93,18 @@
 		z-index: 6;
 		width: 20rem;
 		max-width: 80vw;
-		background-color: #222;
 	}
 	.popup > * {
 		padding: 0.5rem;
 	}
+	.popup > hr {
+		border: 0;
+		height: 2px;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+	}
 	.title-bar {
-		background-color: #333;
 		text-align: right;
 	}
 	.tab-bar {
@@ -98,13 +119,13 @@
 		height: 3rem;
 		border: 0;
 		border-radius: 0;
-		background-color: #333;
 	}
 	.center {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: center;
+		overflow: hidden;
 	}
 	.canvas {
 		width: 50vmax;

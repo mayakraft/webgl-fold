@@ -109,8 +109,8 @@ const getFilenameParts = (contents, filename) => {
 	return { name, extension };
 };
 
-const makeAssignments = (flat) => {
-	const edgesStroke = svgToFold.getEdgesStroke(flat);
+const makeAssignments = (segments) => {
+	const edgesStroke = segments.map(el => el.stroke);
 	const strokes = Array.from(new Set(edgesStroke))
 		.filter(el => typeof el === "string");
 	const assignments = {};
@@ -119,6 +119,16 @@ const makeAssignments = (flat) => {
 	});
 	return assignments;
 };
+// const makeAssignments = (flat) => {
+// 	const edgesStroke = svgToFold.getEdgesStroke(flat);
+// 	const strokes = Array.from(new Set(edgesStroke))
+// 		.filter(el => typeof el === "string");
+// 	const assignments = {};
+// 	strokes.forEach(stroke => {
+// 		assignments[stroke] = rgbToAssignment(...parseColorToRgb(stroke))
+// 	});
+// 	return assignments;
+// };
 /**
  * @param {string} contents the file contents as a string
  * @param {string} filename the name of the file hopefully with an extension
@@ -145,7 +155,8 @@ export const tryLoadFile = (contents, filename, options) => (
 			break;
 		case "svg":
 			const svg = xmlStringToElement(contents, "image/svg+xml");
-			const flat = flattenDomTreeWithStyle(svg);
+			// const flat = flattenDomTreeWithStyle(svg);
+			const segments = svgToFold.svgSegments(svg);
 			edgeGraph = svgToFold.svgEdgeGraph(svg);
 			uploadData.set({
 				contents,
@@ -155,12 +166,12 @@ export const tryLoadFile = (contents, filename, options) => (
 				edgeGraph,
 				boundingBox: boundingBox(edgeGraph),
 				svg,
-				flat,
+				// flat,
 				options: {
 					// epsilon: getNthPercentileEdgeLength(edgeGraph, 0.05) * 0.1,
 					epsilon: shortestEdgeLength(edgeGraph) / 4,
 					boundary: true,
-					assignments: makeAssignments(flat),
+					assignments: makeAssignments(segments),
 					yFlip: false,
 				},
 			});

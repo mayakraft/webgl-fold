@@ -1,10 +1,13 @@
 import { writable } from "svelte/store";
 
+// darkmode or lightmode
+export const colorMode = writable("light");
+
 // the camera's perspective: "orthographic" or "perspective"
 export const perspective = writable("orthographic");
 
 // the camera's field of view
-export const fov = writable(30);
+export const fov = writable(30.25);
 
 // flip the camera around so that we are
 // looking at the model from directly behind
@@ -30,4 +33,4 @@ export const showFoldedFaceOutlines = writable(true);
 
 // if a 3D model comes with faceOrders, this is
 // the amount of space between overlapping faces
-export const layerNudge = writable(1e-5);
+export const layerNudge = writable(1e-6);

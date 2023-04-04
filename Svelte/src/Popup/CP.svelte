@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
 	import foldToSvg from "rabbit-ear/convert/foldToSvg/index.js";
 	export let data;
 	export let epsilon;
+	export let showEpsilon;
 	let svg;
 	let layer;
 	let rendering;
@@ -24,6 +25,13 @@
 	}
 
 	$: {
+		if (rendering) {
+			rendering.getElementsByClassName("vertices")[0]
+				.setAttribute("visibility", showEpsilon ? "show" : "hidden");
+		}
+	}
+
+	$: {
 		if (rendering && epsilon !== undefined) {
 			const verticesGroup = rendering.getElementsByClassName("vertices")[0];
 			const vertices = Array.from(verticesGroup.childNodes);
@@ -41,6 +49,7 @@
 svg {
 	width: 100%;
 	height: 100%;
+	overflow: visible;
 }
 /*
 :global(svg .boundary) { stroke: #444; }

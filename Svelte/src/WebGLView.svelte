@@ -30,6 +30,7 @@
 		makeViewMatrixBack,
 	} from "../../shared/view.js";
 	import {
+		colorMode,
 		perspective,
 		fov,
 		flipCameraZ,
@@ -48,18 +49,24 @@
 	const WebGLProgram = { creasePattern, foldedForm };
 
 	const dragSpeed = 3.0;
+
 	// Svelte will bind these. canvas to <canvas>
 	let canvas;
 	let { innerWidth, innerHeight } = window;
-	// WebGL things
-	let gl; // the WebGL instance
-	let version; // which WebGL version was initialized: 1 or 2
-	// let animationID;
+
+	// the WebGL instance
+	let gl;
+	// which WebGL version was initialized: 1 or 2
+	let version;
+
+	// all mesh and shader data
 	let programs = [];
-	// gl matrices
+
+	// matrices
 	let projectionMatrix = identity4x4;
 	let viewMatrix = identity4x4;
 	let modelMatrix = identity4x4;
+
 	// touch interaction
 	let pressVector; // this is the location of the onPress. used in onMove.
 	let pressViewMatrix; // onPress. used in onMove.
@@ -69,13 +76,14 @@
 	const draw = () => {
 		if (!gl) { return; }
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		// console.log("projectionMatrix, viewMatrix, modelMatrix", projectionMatrix, viewMatrix, modelMatrix);
 		const uniforms = programs.map(prog => prog.makeUniforms(gl, {
-			projectionMatrix, viewMatrix, modelMatrix, touchPoint, canvas, projectedTouch,
-			strokeWidth: $strokeWidth,
-			opacity: $opacity,
+			projectionMatrix,
+			modelViewMatrix: multiplyMatrices4(viewMatrix, modelMatrix),
 			frontColor: $frontColor,
 			backColor: $backColor,
+			cpColor: $colorMode === "dark" ? "#222" : "white",
+			strokeWidth: $strokeWidth,
+			opacity: $opacity,
 		}));
 		programs.forEach((program, i) => drawProgram(gl, version, program, uniforms[i]));
 	};
@@ -88,20 +96,7 @@
 			outlines: $showFoldedFaceOutlines,
 			edges: $showFoldedCreases,
 			faces: $showFoldedFaces,
-			B: [0.5, 0.5, 0.5],
-			b: [0.5, 0.5, 0.5],
-			V: [0.2, 0.4, 0.6],
-			v: [0.2, 0.4, 0.6],
-			M: [0.75, 0.25, 0.15],
-			m: [0.75, 0.25, 0.15],
-			F: [0.3, 0.3, 0.3],
-			f: [0.3, 0.3, 0.3],
-			J: [0.3, 0.2, 0.0],
-			j: [0.3, 0.2, 0.0],
-			C: [0.5, 0.8, 0.1],
-			c: [0.5, 0.8, 0.1],
-			U: [0.6, 0.25, 0.9],
-			u: [0.6, 0.25, 0.9],
+			dark: $colorMode === "dark",
 		};
 		programs = [...WebGLProgram[$viewClass](gl, version, graph, options)];
 		// programs.push(...TouchIndicators(gl, version));
@@ -134,7 +129,7 @@
 
 	$: rebuildModelAndDraw($layerNudge, $showFoldedCreases, $showFoldedFaces, $showFoldedFaceOutlines);
 	$: rebuildProjectionAndDraw(innerWidth, innerHeight, $fov);
-	$: rebuildAllAndDraw($frame, $viewClass, $perspective, $flipCameraZ);
+	$: rebuildAllAndDraw($frame, $viewClass, $perspective, $flipCameraZ, $colorMode);
 	$: draw($strokeWidth, $opacity, $frontColor, $backColor);
 
 	onMount(() => {
@@ -166,7 +161,8 @@
 		// 	draw();
 		// };
 		// animate();
-		console.log(`using WebGL ${version}`);
+
+		// console.log(`using WebGL ${version}`);
 	});
 
 

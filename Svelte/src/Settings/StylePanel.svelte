@@ -4,6 +4,7 @@
 		frame,
 	} from "../stores/File.js";
 	import {
+		colorMode,
 		perspective,
 		fov,
 		flipCameraZ,
@@ -21,32 +22,55 @@
 	import { boundingBox } from "rabbit-ear/graph/boundary.js";
 
 	let strokeWidthSlider = 5;
-	$: $strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+	$: $strokeWidth = Math.pow(2, strokeWidthSlider) / 1e5;
 
 	let layerNudgeSlider = 6;
-	$: $layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+	$: $layerNudge = Math.pow(2, layerNudgeSlider) / 1e6;
 
 	const updateSliders = (graph) => {
 		const avgEdgeLen = averageEdgeLength(graph);
-		// invert this: Math.pow(2, strokeWidthSlider) / 100000;
+		// invert this: Math.pow(2, strokeWidthSlider) / 1e5;
 		strokeWidthSlider = !avgEdgeLen
 			? 0.1
-			: Math.log2((avgEdgeLen * 0.02) * 100000);
-		$strokeWidth = Math.pow(2, strokeWidthSlider) / 100000;
+			: Math.log2((avgEdgeLen * 0.02) * 1e5);
+		$strokeWidth = Math.pow(2, strokeWidthSlider) / 1e5;
 		// find a decent spacing between layers (layerNudge)
 		const bounds = boundingBox(graph);
 		if (bounds && bounds.span) {
 			const maxSpan = Math.max(...bounds.span);
-			layerNudgeSlider = Math.log2((maxSpan * 0.001) * 100000);
-			$layerNudge = Math.pow(2, layerNudgeSlider) / 1000000;
+			layerNudgeSlider = Math.log2((maxSpan * 0.001) * 1e5);
+			$layerNudge = Math.pow(2, layerNudgeSlider) / 1e6;
 		}
 	};
+
+	$: {
+		window.document.body.classList.remove("light");
+		window.document.body.classList.remove("dark");
+		window.document.body.classList.add($colorMode);
+	}
 
 	$: updateSliders($frame);
 </script>
 
+	<h3>theme</h3>
+	<input
+		type="radio"
+		bind:group={$colorMode}
+		name="radio-webgl-colorMode"
+		id="radio-webgl-colorMode-light"
+		value="light">
+	<label for="radio-webgl-colorMode-light">light</label>
+	<input
+		type="radio"
+		bind:group={$colorMode}
+		name="radio-webgl-colorMode"
+		id="radio-webgl-colorMode-dark"
+		value="dark">
+	<label for="radio-webgl-colorMode-dark">dark</label>
+
+	<hr />
+
 	<h3>viewport</h3>
-	<!-- perspective (orthographic/perspective) -->
 	<input
 		type="radio"
 		bind:group={$perspective}
@@ -62,20 +86,17 @@
 		value="perspective">
 	<label for="radio-webgl-perspective-perspective">perspective</label>
 	<br />
-	<!-- field of view -->
 	{#if perspective === "perspective"}
 		<span>field of view:</span>
 		<input type="text" placeholder="field of view" bind:value={$fov}>
 		<br/>
 	{/if}
-	<!-- flip model over -->
 	<span>flip over</span>
 	<input type="checkbox" bind:checked={$flipCameraZ} />
 
 	<hr />
 
 	<h3>style</h3>
-	<!-- view style (folded/cp) -->
 	<input
 		type="radio"
 		name="radio-view-class"
@@ -91,7 +112,6 @@
 		value="foldedForm">
 	<label for="radio-view-class-folded">folded form</label>
 	<br />
-	<!-- stroke width -->
 	{#if $viewClass === "creasePattern"}
 		<span>stroke width</span><input
 			type="range"
@@ -100,19 +120,17 @@
 			step="0.01"
 			bind:value={strokeWidthSlider} />
 	{/if}
-	<!-- folded form face style -->
 	{#if $viewClass === "foldedForm"}
-		<span>opacity</span><input
+<!-- 		<span>opacity</span><input
 			type="range"
 			min="0"
 			max="1"
 			step="0.01"
 			bind:value={$opacity} />
-		<br />
+		<br /> -->
 		<span>front</span><input type="text" bind:value={$frontColor} />
 		<span>back</span><input type="text" bind:value={$backColor} />
 	{/if}
-	<!-- folded form edge style -->
 	{#if $viewClass === "foldedForm"}
 		<br/>
 		<span>show faces</span>
@@ -140,10 +158,11 @@
 			disabled={!$showFoldedCreases} />
 		<br/>
 	{/if}
-	<!-- nudge layers for origami with layer orders -->
 	{#if $viewClass === "foldedForm" && $FOLD !== undefined}
 		{#if $FOLD.faceOrders || $FOLD.faces_layer}
+
 			<hr />
+
 			<h3>overlapping faces</h3>
 			<span>explode layers</span><input
 				type="range"

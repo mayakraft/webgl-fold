@@ -14,8 +14,7 @@
 
 	<p>
 		{#if $frame[key]}
-			<span class="light">{prettify(key)}:</span>
-			<span>✓</span>
+			<span class="light">{prettify(key)}: ✓</span>
 		{/if}
 		{#if !$frame[key]}
 			<span>{prettify(key)}:</span>
@@ -33,11 +32,9 @@
 		font-size: 0.8rem;
 		line-height: 1rem;
 		word-break: break-word;
-		color: #999;
 	}
 	.light {
-		color: #ccc;
-		font-weight: bold;
+		opacity: 0.5;
 	}
 	button {
 		line-height: 0.65rem;

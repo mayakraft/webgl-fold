@@ -8,9 +8,7 @@
   line-height: 24px;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/*  color-scheme: light dark;*/
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -30,15 +28,26 @@ html, body {
 }
 body {
   margin: 0;
+  transition: background-color 0.3s;
+  color: #222;
+  background-color: #eee;
+}
+body.dark {
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 }
 p { margin: 0 }
 
+button { color: #37c; }
+body.dark button { color: #49f; }
+button:hover { border-color: #37c; }
+body.dark button:hover { border-color: #49f; }
+
 button {
-  color: #49f;
   border-radius: 3px;
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: bold;
   font-family: inherit;
   background-color: transparent;
   cursor: pointer;
@@ -47,7 +56,6 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #49f;
   transition: border-color 0s;
 }
 button:focus,
@@ -57,7 +65,7 @@ button:focus-visible {
 hr {
   margin: 0.5rem 0;
 }
-
+/*
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -70,3 +78,4 @@ hr {
     background-color: #f9f9f9;
   }
 }
+*/

@@ -1,5 +1,6 @@
 <script>
 	import Examples from "./Examples.svelte";
+	import FileSummary from "./FileSummary.svelte";
 	import FileContents from "./FileContents.svelte";
 	import StylePanel from "./StylePanel.svelte";
 	import {
@@ -7,7 +8,7 @@
 		selectedExample,
 	} from "../stores/File.js";
 
-	let showFileContents = true;
+	let showFileContents = false;
 	let showStyle = false;
 
 	const fileDialogDidLoad = (string, filename, mimeType) => {
@@ -30,18 +31,18 @@
 </script>
 
 <div class="settings">
-	<h3>FOLD</h3>
+
 	<input type="file" bind:files>
-
 	<br />
-
 	<Examples />
+
+	<FileSummary />
 
 	<button
 		class="dropdown"
 		on:click={() => showFileContents = !showFileContents}
 		>
-		<h3>file</h3>
+		<h3>data</h3>
 		{#if showFileContents}
 			<span class="triangle">▼</span>
 		{/if}
@@ -74,8 +75,9 @@
 </div>
 
 <style>
+	:global(body) .settings { background-color: #fffc; }
+	:global(body.dark) .settings { background-color: #1118; }
 	.settings {
-		background-color: #0002;
 		z-index: 2;
 		position: absolute;
 		top: 0;
@@ -105,7 +107,6 @@
 	.dropdown {
 		text-transform: uppercase;
 		letter-spacing: 0.15rem;
-		background-color: #4444;
 		margin: 0.25rem -0.5rem;
 		padding: 0rem 0.5rem;
 		border-top: 2px solid #666;
@@ -115,9 +116,10 @@
 		justify-content: space-between;
 		cursor: pointer;
 	}
-	.dropdown:hover {
-		background-color: #6664;
-	}
+	:global(body) .dropdown { background-color: #eee; }
+	:global(body) .dropdown:hover { background-color: #ddd; }
+	:global(body.dark) .dropdown { background-color: #0002; }
+	:global(body.dark) .dropdown:hover { background-color: #fff1; }
 	.dropdown h3 {
 		font-size: 1rem;
 	}

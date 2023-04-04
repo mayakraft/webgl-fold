@@ -16,6 +16,9 @@
 	let boundary = true;
 	let yFlip = false;
 
+	// which page is the popup on (show/hide epsilon)
+	let pageIndex;
+
 	const convertDidPress = () => {
 		$uploadData.options = {
 			assignments,
@@ -55,26 +58,38 @@
 	// 	}
 	// }
 
+	const setDefaults = () => {
+		epsilon = $uploadData.options.epsilon;
+		epsilonSlider = Math.log2(epsilon * 10000);
+		assignments = $uploadData.options.assignments;
+	}
+
+	$: setDefaults($uploadData);
+
 	onMount(() => {
-		if (bootLoop) { clearInterval(bootLoop); }
+		if (bootLoop) {
+			clearInterval(bootLoop);
+		}
 		bootLoop = setInterval(() => {
 			if ($uploadData && $uploadData.edgeGraph) {
-				epsilonSlider = Math.log2(($uploadData.options.epsilon) * 10000);
-				assignments = $uploadData.options.assignments;
+				setDefaults();
 				clearInterval(bootLoop);
 			}
 		}, 50)
 	});
+
 	onDestroy(() => {
-		if (bootLoop) { clearInterval(bootLoop); }
+		if (bootLoop) {
+			clearInterval(bootLoop);
+		}
 	});
 
 </script>
 
 {#if $uploadData && $uploadData.extension && $uploadData.edgeGraph}
-	<Popup pageNames={["size", "colors", "boundary", "epsilon"]}>
+	<Popup pageNames={["size", "colors", "boundary", "epsilon"]} bind:pageIndex={pageIndex}>
 		<button slot="title-bar" on:click={convertDidPress}>import</button>
-		<CP slot="canvas" data={$uploadData} {epsilon} />
+		<CP slot="canvas" data={$uploadData} {epsilon} showEpsilon={pageIndex === 3} />
 		<div slot="page-0">
 			<h3>dimensions</h3>
 			<p>{$uploadData.boundingBox.span
@@ -118,22 +133,26 @@
 {/if}
 
 <style>
+	:global(body) p,
+	:global(body) label { color: #333; }
+	:global(body.dark) p,
+	:global(body.dark) label { color: #bbb; }
+	:global(body) .italic { color: #888; }
+	:global(body.dark) .italic { color: #888; }
+	:global(body) button { color: black; }
+	:global(body.dark) button { color: #39f; }
+	:global(body) button:hover { color: #39f; }
+	:global(body.dark) button:hover { color: white; }
 	h3 {
 		margin: 0;
 		padding: 0;
 	}
-	p, label {
-		color: #bbb;
-	}
 	button {
-		font-weight: bold;
 		border: none;
-		border-color: #49f;
-		transition: color 0.25s, border-color 0.25s;
+		font-weight: bold;
+		transition: color 0.25s;
 	}
 	button:hover {
-		color: #fff;
-		border-color: #fff;
 		transition: border-color 0s;
 	}
 	button:focus,
@@ -141,7 +160,6 @@
 		outline: 4px auto -webkit-focus-ring-color;
 	}
 	.italic {
-		color: #888;
 		font-style: italic;
 	}
 </style>

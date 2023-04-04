@@ -65,22 +65,22 @@
 {/if}
 
 <style>
+	:global(body) p { color: #666; }
+	:global(body.dark) p { color: #bbb; }
+	:global(body) button { color: black; }
+	:global(body.dark) button { color: #39f; }
+	:global(body) button:hover { color: #39f; }
+	:global(body.dark) button:hover { color: white; }
 	h3 {
 		margin: 0;
 		padding: 0;
 	}
-	p, label {
-		color: #bbb;
-	}
 	button {
-		font-weight: bold;
 		border: none;
-		border-color: #49f;
-		transition: color 0.25s, border-color 0.25s;
+		font-weight: bold;
+		transition: color 0.25s;
 	}
 	button:hover {
-		color: #fff;
-		border-color: #fff;
 		transition: border-color 0s;
 	}
 	button:focus,

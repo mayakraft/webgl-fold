@@ -13,6 +13,9 @@
 	let epsilon;
 	// let yFlip = false;
 
+	// which page is the popup on (show/hide epsilon)
+	let pageIndex;
+
 	const convertDidPress = () => {
 		$uploadData.options = { epsilon };
 		// $uploadData.options = { epsilon, yFlip };
@@ -37,9 +40,9 @@
 </script>
 
 {#if $uploadData && $uploadData.extension && $uploadData.edgeGraph}
-	<Popup pageNames={["size", "epsilon"]}>
+	<Popup pageNames={["size", "epsilon"]} bind:pageIndex={pageIndex}>>
 		<button slot="title-bar" on:click={convertDidPress}>import</button>
-		<CP slot="canvas" data={$uploadData} {epsilon} />
+		<CP slot="canvas" data={$uploadData} {epsilon} showEpsilon={pageIndex === 1} />
 		<div slot="page-0">
 			<h3>dimensions</h3>
 			<p>{$uploadData.boundingBox.span

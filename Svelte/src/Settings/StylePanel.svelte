@@ -121,7 +121,7 @@
 			bind:value={strokeWidthSlider} />
 	{/if}
 	{#if $viewClass === "foldedForm"}
-<!-- 		<span>opacity</span><input
+		<!-- <span>opacity</span><input
 			type="range"
 			min="0"
 			max="1"

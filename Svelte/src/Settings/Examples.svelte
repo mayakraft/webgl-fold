@@ -27,8 +27,7 @@
 	}
 
 	// load example on start
-	// onMount(() => $selectedExample = "craneFolded");
-	onMount(() => $selectedExample = "placeholder");
+	onMount(() => $selectedExample = "placeholder"); // "craneFolded");
 
 </script>
 

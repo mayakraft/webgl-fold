@@ -54,9 +54,8 @@
 	let canvas;
 	let { innerWidth, innerHeight } = window;
 
-	// the WebGL instance
+	// the WebGL instance and which version: 1 or 2
 	let gl;
-	// which WebGL version was initialized: 1 or 2
 	let version;
 
 	// all mesh and shader data
@@ -81,7 +80,7 @@
 			modelViewMatrix: multiplyMatrices4(viewMatrix, modelMatrix),
 			frontColor: $frontColor,
 			backColor: $backColor,
-			cpColor: $colorMode === "dark" ? "#222" : "white",
+			cpColor: $colorMode === "dark" ? "#191919" : "white",
 			strokeWidth: $strokeWidth,
 			opacity: $opacity,
 		}));

@@ -7,9 +7,6 @@
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-
-/*  color-scheme: light dark;*/
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -65,17 +62,3 @@ button:focus-visible {
 hr {
   margin: 0.5rem 0;
 }
-/*
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}
-*/

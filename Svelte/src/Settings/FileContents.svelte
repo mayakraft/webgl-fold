@@ -115,11 +115,9 @@
 		font-size: 0.8rem;
 		line-height: 1rem;
 		word-break: break-word;
-/*		opacity: 0.5;*/
 	}
 	.value {
 		font-weight: bold;
-/*		opacity: 1;*/
 	}
 	.pill {
 		font-weight: bold;

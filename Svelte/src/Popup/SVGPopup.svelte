@@ -50,14 +50,6 @@
 			.map(el => `${el.key}: ${el.count}`)
 		: "";
 
-	// $: {
-	// 	if ($uploadData && $uploadData.edgeGraph) {
-	// 		// $: epsilon = Math.pow(2, epsilonSlider) / 10000;
-	// 		epsilonSlider = Math.log2(($uploadData.epsilon) * 10000);
-	// 		console.log("setting epsilon slider", Math.log2(($uploadData.epsilon) * 10000));
-	// 	}
-	// }
-
 	const setDefaults = () => {
 		epsilon = $uploadData.options.epsilon;
 		epsilonSlider = Math.log2(epsilon * 10000);

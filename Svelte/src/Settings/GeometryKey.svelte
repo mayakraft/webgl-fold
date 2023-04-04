@@ -9,12 +9,11 @@
 	export let key = "";
 
 	const generateGeometry = () => modifyFrame(makeComponent($frame, key));
-
 </script>
 
 	<p>
 		{#if $frame[key]}
-			<span class="light">{prettify(key)}: ✓</span>
+			<span class="included">{prettify(key)}: ✓</span>
 		{/if}
 		{#if !$frame[key]}
 			<span>{prettify(key)}:</span>
@@ -26,15 +25,16 @@
 	</p>
 
 <style>
+	:global(body) span { color: #888; }
+	:global(body.dark) span { color: #aaa; }
+	:global(body) .included { color: black; }
+	:global(body.dark) .included { color: rgba(255, 255, 255, 0.87); }
 	p {
 		margin: 0;
 		padding: 0;
 		font-size: 0.8rem;
 		line-height: 1rem;
 		word-break: break-word;
-	}
-	.light {
-		opacity: 0.5;
 	}
 	button {
 		line-height: 0.65rem;

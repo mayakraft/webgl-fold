@@ -2,12 +2,7 @@
 import { edgesAssignmentNames } from "rabbit-ear/fold/spec.js";
 	import { onMount, onDestroy } from "svelte";
 	export let assignments = {};
-	// export let data = undefined;
-
-	// $: console.log("assignments", assignments);
-
 	const allAssignments = ["B", "M", "V", "F", "J", "C", "U"];
-	// $: data && data.options ? console.log("data", data.options.assignments) : undefined;
 </script>
 
 <div class="container">
